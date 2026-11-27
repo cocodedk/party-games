@@ -25,7 +25,7 @@ export function createMatch({ rng }) {
 
   /** Ignores an unknown mode or a value that is not a whole number in the mode's range; only in the lobby. */
   function settings(mode, value) {
-    const range = Object.hasOwn(MATCH_RANGE, mode) && MATCH_RANGE[mode];
+    const range = Object.prototype.hasOwnProperty.call(MATCH_RANGE, mode) && MATCH_RANGE[mode];
     if (phase !== PHASE.LOBBY || !range || !Number.isInteger(value) || value < range.min || value > range.max) return false;
     Object.assign(rules, { mode, value });
     return true;

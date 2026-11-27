@@ -1,5 +1,5 @@
 // Ball step with wall, goal and bat collisions; teammate bumps live in bumps.js.
-// world = { ball, bats (array or Map), now (ms) }; stepWorld advances now by dt.
+// world = { ball (null: bats only, no goal), bats (array or Map), now (ms) }; stepWorld advances now by dt.
 // Bats and ball move together in substeps, each moving at most half a bat thickness.
 import {
   TEAM, FIELD_W, FIELD_H, BAT_LENGTH, BAT_THICKNESS, MS_PER_S, BALL_RADIUS, BALL_MAX,
@@ -121,7 +121,7 @@ export function stepWorld(world, dt) {
       clamp(bat);
     });
     bump(bats, now, events);
-    if (scored) continue;
+    if (scored || !ball) continue;
     ball.x += ball.vx * dt / n;
     ball.y += ball.vy * dt / n;
     collideWalls(ball, events);

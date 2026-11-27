@@ -1,7 +1,7 @@
 // The lobby: QR code, room code, join URL and each team's player list.
 import * as stylex from '@stylexjs/stylex';
 import { styles } from './styles.js';
-import { TEAMS, TEAM, TEAM_NAME, QR_PATH, ROOM_PARAM, SCREEN_TEXT } from '../shared/constants.js';
+import { TEAMS, TEAM, TEAM_NAME, QR_PATH, ROOM_PARAM, SCREEN_TEXT, HOST_PATH, RULES_TEXT } from '../shared/constants.js';
 
 const byId = (id) => document.getElementById(id);
 
@@ -25,7 +25,7 @@ export function createLobby() {
     apply(list, styles.list);
     lists[team] = list;
   }
-  for (const id of ['join', 'qr', 'joinText', 'codeLabel', 'code', 'url']) apply(byId(id), styles[id]);
+  for (const id of ['join', 'qr', 'joinText', 'codeLabel', 'code', 'url', 'host', 'rules']) apply(byId(id), styles[id]);
 
   function refresh(team) {
     const list = lists[team];
@@ -46,6 +46,7 @@ export function createLobby() {
       byId('qr').src = `${QR_PATH}?${ROOM_PARAM}=${encodeURIComponent(room)}`;
       byId('code').textContent = room;
       byId('url').textContent = `${base}/?${ROOM_PARAM}=${room}`;
+      byId('host').textContent = SCREEN_TEXT.HOST(`${base}${HOST_PATH}?${ROOM_PARAM}=${room}`);
       TEAMS.forEach(refresh);
       apply(root, styles.lobby);
       root.hidden = false;
@@ -64,6 +65,11 @@ export function createLobby() {
       p.item.remove();
       players.delete(id);
       refresh(p.team);
+    },
+    /** Shows the band (lobby phase) with the chosen rules, or hides it during a match. */
+    update(visible, { mode, value }) {
+      root.style.display = visible ? '' : 'none'; // the band's display:flex class would beat the hidden attribute
+      byId('rules').textContent = RULES_TEXT[mode](value);
     },
     destroy() {
       root.remove();
