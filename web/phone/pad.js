@@ -2,8 +2,7 @@
 // x, y are the touch over the pad size (0..1); a turns by the signed angle between
 // successive movement directions, so a straight drag keeps a and a circle adds about 2 pi.
 import { PAD_MIN_MOVE } from '../shared/constants.js';
-
-export const unit = (v) => Math.min(1, Math.max(0, v));
+import { unit } from '../shared/unit.js';
 
 export function createPad() {
   let a = 0;

@@ -2,7 +2,7 @@
 // those tools call. An agent's input is not checked against inputSchema, so every tool goes through here.
 import { ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, NAME_MAX, TEAMS, MATCH_MODE, MATCH_RANGE } from './constants.js';
 import { MOVE_ANGLE_MAX, WEBMCP_ERROR } from './webmcp-constants.js';
-import { unit } from '../phone/pad.js';
+import { unit } from './unit.js';
 
 const ROOM_PATTERN = new RegExp(`^[${ROOM_CODE_ALPHABET}]{${ROOM_CODE_LENGTH}}$`);
 const MODES = Object.values(MATCH_MODE);
