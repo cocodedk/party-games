@@ -3,6 +3,7 @@ import { createControls } from './controls.js';
 import { apply } from '../shared/dom.js';
 import { connect } from '../shared/net.js';
 import { styles } from './styles.js';
+import { registerPhoneTools } from './tools.js';
 import {
   MSG, NET_EVENT, JOIN_ERROR, ROOM_PARAM, WS_PATH, INPUT_PER_S, MS_PER_S, ROOM_CODE_LENGTH, NAME_MAX, PHONE_TEXT,
 } from '../shared/constants.js';
@@ -47,6 +48,7 @@ function hangUp() {
   clearTimeout(timer);
   timer = 0;
   pointer = null;
+  pad = null; // move_bat waits for the next JOINED
 }
 
 function fail(text) {
@@ -144,6 +146,20 @@ el.pad.addEventListener('pointerup', lift);
 el.pad.addEventListener('pointercancel', lift);
 
 el.form.addEventListener('submit', join);
+registerPhoneTools({
+  join(msg) { // fills the form as a person would, then submits it
+    el.room.value = msg.room;
+    el.name.value = msg.name;
+    pickTeam(msg.team);
+    join(new Event('submit'));
+  },
+  move(next) { // the pad's path: the latest pose, sent by sendPose()
+    if (!pad || !net) return false;
+    pose = next;
+    sendPose();
+    return true;
+  },
+});
 for (const b of teamButtons) b.addEventListener('click', () => pickTeam(b.dataset.team));
 el.again.addEventListener('click', () => {
   el.error.textContent = '';

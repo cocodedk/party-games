@@ -1,10 +1,7 @@
 // /screen's WebMCP tools: read-only answers from the screen's own state at call time.
 import { initTools } from '../shared/webmcp.js';
-import { TOOL, TOOL_DESCRIPTION, SCREEN_PAGE, BAT_UNITS } from '../shared/webmcp-constants.js';
+import { TOOL, TOOL_DESCRIPTION, SCREEN_PAGE, BAT_UNITS, NO_INPUT, READ_ONLY } from '../shared/webmcp-constants.js';
 import { TEAMS } from '../shared/constants.js';
-
-const NO_INPUT = { type: 'object', properties: {} };
-const READ_ONLY = { readOnlyHint: true };
 
 // read() -> { room, view: match.view(), bats: [{ id, team, name, x, y, a }] }
 export function registerScreenTools(read) {
