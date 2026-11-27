@@ -4,6 +4,7 @@ import { connect } from '../shared/net.js';
 import { apply } from '../shared/dom.js';
 import { styles as phone } from '../phone/styles.js';
 import { styles } from './styles.js';
+import { registerHostTools } from './tools.js';
 import { MSG, NET_EVENT, ROOM_PARAM, WS_PATH, ROOM_CODE_LENGTH, PHONE_TEXT } from '../shared/constants.js';
 
 const byId = (id) => document.getElementById(id);
@@ -29,6 +30,7 @@ function hangUp() {
   if (net) net.close();
   net = null;
   setBusy(false);
+  controls.role(false); // no game-master tools without a connection
 }
 
 function fail(text) {
@@ -86,6 +88,7 @@ apply(el.lost, phone.lost);
 apply(el.again, phone.button);
 apply(el.controls, styles.controls);
 apply(el.who, phone.who);
+registerHostTools(controls.tools);
 setBusy(false);
 el.room.maxLength = ROOM_CODE_LENGTH;
 el.room.value = new URLSearchParams(location.search).get(ROOM_PARAM) || '';

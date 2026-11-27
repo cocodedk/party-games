@@ -1,5 +1,5 @@
 // WebMCP: tool names and the texts an agent reads. Extended by the page tools (screen, phone, game master).
-import { MATCH_MODE, NAME_MAX, FIELD_W, FIELD_H } from './constants.js';
+import { MATCH_MODE, MATCH_RANGE, NAME_MAX, FIELD_W, FIELD_H } from './constants.js';
 
 export const NO_INPUT = { type: 'object', properties: {} }; // inputSchema of a tool that takes nothing
 export const READ_ONLY = { readOnlyHint: true };
@@ -21,6 +21,11 @@ export const TOOL_DESCRIPTION = {
   PHONE_DESCRIBE: 'Say what this phone page shows now: the join form (with any error), the bat pad (with the player and team) or the lost-connection notice, and which tools it has. Read-only.',
   PHONE_JOIN: 'Join the room on the TV with a name and a team, as the Join button does. It only sends the request: call describe afterwards to see the bat pad, or the join form with the error.',
   PHONE_MOVE_BAT: 'Move this player\'s bat, as a finger on the pad does: x and y from 0 to 1 across the team\'s half (from the top left), angle in radians (0 upright, positive clockwise). Values out of range are clamped; the answer gives the pose sent. Only after joining.',
+  SET_RULES: 'Choose the match rules before it starts, as the Time/Goals toggle and the -/+ buttons do: mode "time" (value in minutes) or "score" (value in goals to win). Offered only to the game master; works in the lobby only.',
+  START: 'Start the match, as the Start button does (lobby only, with at least one player on each team). The TV counts down 3-2-1 first.',
+  PAUSE: 'Pause the match, or resume it when it is paused, as the Pause/Resume button does. Works only while a match is on.',
+  END: 'End the match now, as the End button does: the TV shows the final score and the winner. It cannot be undone.',
+  HOST_DESCRIBE: 'Say what this game-master page shows now: the room form (with any error), the match controls (with the room) or the lost-connection notice, whether this page is game master, and which tools it has. Read-only.',
   SCREEN_GET_STATE: 'Read the match now: room code, each team with its player names, score, phase, seconds left (null in a goals match) and every bat (player id, team, x, y, angle). Read-only.',
 };
 
@@ -45,6 +50,17 @@ export const FIELD_TEXT = {
   X: 'Across the team\'s half, 0 to 1 from the left.',
   Y: 'Down the field, 0 to 1 from the top.',
   ANGLE: 'Radians: 0 upright, positive clockwise.',
+  MODE: 'time: play for a number of minutes; score: first team to a number of goals wins.',
+  VALUE: `A whole number: minutes ${MATCH_RANGE[MATCH_MODE.TIME].min}-${MATCH_RANGE[MATCH_MODE.TIME].max}, goals ${MATCH_RANGE[MATCH_MODE.SCORE].min}-${MATCH_RANGE[MATCH_MODE.SCORE].max}.`,
+};
+export const MASTER_TOOLS = [TOOL.SET_RULES, TOOL.START, TOOL.PAUSE, TOOL.END];
+export const HOST_PAGE = 'The game-master page of Team Pong, for a laptop: first a form for the room code on the TV, then the match controls '
+  + '(rules and Start in the lobby, Pause and End during a match) while this page is game master, otherwise a waiting line.';
+export const HOST_VIEW = { FORM: 'form', CONTROLS: 'controls', LOST: 'lost' };
+export const HOST_VIEW_TEXT = {
+  [HOST_VIEW.FORM]: { id: 'error', key: 'formError' },
+  [HOST_VIEW.CONTROLS]: { id: 'who', key: 'room' },
+  [HOST_VIEW.LOST]: { id: 'lostText', key: 'notice' },
 };
 export const BAT_UNITS = `x and y in field units (x 0..${FIELD_W}, y 0..${FIELD_H}, from the top left); angle in radians, 0 upright, positive clockwise.`;
 
@@ -59,5 +75,6 @@ export const WEBMCP_ERROR = {
   BAD_MODE: `mode must be "${MATCH_MODE.TIME}" or "${MATCH_MODE.SCORE}".`,
   NOT_JOINED: 'Join a room first: the bat moves only once the pad is showing.',
   ALREADY_JOINED: 'This phone has joined already: its bat pad is showing.',
+  NOT_NOW: 'That button is not on the game master\'s screen right now (wrong phase, or not enough players).',
   BAD_VALUE: 'value must be a whole number in the range for the mode.',
 };

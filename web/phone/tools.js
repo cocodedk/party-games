@@ -27,12 +27,12 @@ const MOVE_INPUT = {
   required: ['x', 'y', 'angle'],
 };
 
-// page.join({room, name, team}) submits the form; page.move({x, y, a}) sends a pose, false before joining.
+// page.masterTools() names the game-master tools offered now; page.join({room, name, team}) submits the form; page.move({x, y, a}) sends a pose, false before joining.
 export function registerPhoneTools(page) {
   const describe = () => {
     const view = showing();
     const { id, key } = PHONE_VIEW_TEXT[view];
-    return { ok: true, page: PHONE_PAGE, showing: view, [key]: byId(id).textContent, tools: [TOOL.DESCRIBE, TOOL.JOIN, TOOL.MOVE_BAT] };
+    return { ok: true, page: PHONE_PAGE, showing: view, [key]: byId(id).textContent, tools: [TOOL.DESCRIBE, TOOL.JOIN, TOOL.MOVE_BAT, ...page.masterTools()] };
   };
   const join = (input) => {
     if (showing() === PHONE_VIEW.PAD) return refuse(WEBMCP_ERROR.ALREADY_JOINED);

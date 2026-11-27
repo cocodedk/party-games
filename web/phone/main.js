@@ -49,6 +49,7 @@ function hangUp() {
   timer = 0;
   pointer = null;
   pad = null; // move_bat waits for the next JOINED
+  controls.role(false); // no game-master tools without a connection
 }
 
 function fail(text) {
@@ -147,6 +148,7 @@ el.pad.addEventListener('pointercancel', lift);
 
 el.form.addEventListener('submit', join);
 registerPhoneTools({
+  masterTools: controls.tools,
   join(msg) { // fills the form as a person would, then submits it
     el.room.value = msg.room;
     el.name.value = msg.name;
