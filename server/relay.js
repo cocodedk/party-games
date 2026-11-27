@@ -15,8 +15,8 @@ function parse(data) {
   }
 }
 
-/** Routes messages between one screen and its phones per room; returns the ws 'connection' handler. */
-export function createRelay(rooms) {
+/** Routes messages between one screen and its phones per room; base is the join URL's origin. Returns the ws 'connection' handler. */
+export function createRelay(rooms, base) {
   const sockets = new Map(); // code → { screen, phones: Map(id → ws) }
 
   const handlers = {
@@ -25,7 +25,7 @@ export function createRelay(rooms) {
       me.code = rooms.create();
       me.isScreen = true;
       sockets.set(me.code, { screen: ws, phones: new Map() });
-      send(ws, MSG.CREATED, { room: me.code });
+      send(ws, MSG.CREATED, { room: me.code, base });
     },
     [MSG.JOIN](ws, me, msg) {
       if (me.code) return;

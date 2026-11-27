@@ -42,6 +42,7 @@ export const LOCALHOST = 'localhost';
 export const QR_PATH = '/qr.svg';
 export const SITE_ROOT = 'dist';
 export const PAGES = { '/': 'index.html', '/screen': 'screen.html', '/host': 'host.html' };
+export const PORT_ENV = 'PORT'; // npm start listens on this environment variable's port, else DEFAULT_PORT
 export const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -86,4 +87,17 @@ export const PHONE_TEXT = {
     [JOIN_ERROR.BAD_NAME]: `Enter a name of 1 to ${NAME_MAX} characters.`,
     [JOIN_ERROR.BAD_TEAM]: 'Pick Left or Right.',
   },
+};
+
+// Screen page.
+export const DPR_MAX = 1.5; // canvas pixels per CSS pixel, capped for cheap drawing on a TV
+export const TEAM_NAME = { [TEAM.LEFT]: 'Left team', [TEAM.RIGHT]: 'Right team' };
+export const FIELD_COLOR = '#000';
+export const LINE_COLOR = '#fff';
+export const LINE_WIDTH = 0.06; // field lines, in field units
+export const MIDLINE_DASH = [0.3, 0.3]; // dash and gap, in field units
+export const SCREEN_TEXT = {
+  STARTING: 'Starting…',
+  EMPTY_TEAM: 'Scan the code to join',
+  LOST: 'Lost the connection to the game server. Reload this page.',
 };

@@ -8,7 +8,7 @@ import { createRelay } from './relay.js';
 import { baseUrl } from './lan.js';
 import { qrSvg } from './qr.js';
 import {
-  DEFAULT_PORT, LOCALHOST, QR_PATH, SITE_ROOT, PAGES, CONTENT_TYPES, CONTENT_TYPE_BINARY, HTTP_STATUS,
+  DEFAULT_PORT, PORT_ENV, LOCALHOST, QR_PATH, SITE_ROOT, PAGES, CONTENT_TYPES, CONTENT_TYPE_BINARY, HTTP_STATUS,
 } from '../web/shared/constants.js';
 
 /** The file under root a request path names, or null when it is malformed or escapes root. */
@@ -45,11 +45,11 @@ export function startServer({ port = DEFAULT_PORT, root = SITE_ROOT } = {}) {
     }
   });
   const wss = new WebSocketServer({ server });
-  wss.on('connection', createRelay(createRooms()));
 
   return new Promise((resolve) => server.listen(port, () => {
     const actual = server.address().port;
     base = baseUrl(process.env, os.networkInterfaces(), actual);
+    wss.on('connection', createRelay(createRooms(), base));
     resolve({
       url: `http://${LOCALHOST}:${actual}`,
       base,
@@ -64,6 +64,6 @@ export function startServer({ port = DEFAULT_PORT, root = SITE_ROOT } = {}) {
 }
 
 if (import.meta.main) {
-  const { base } = await startServer();
+  const { base } = await startServer({ port: Number(process.env[PORT_ENV]) || DEFAULT_PORT });
   console.log(`Screen: ${base}/screen`);
 }
