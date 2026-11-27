@@ -40,9 +40,10 @@ const tools = (page, names) => until(() => listed(page), (have) => names.every((
 test('two phones join, the game master starts the match and a bat moves, all through WebMCP tools', async () => {
   const server = await startServer({ port: 0 });
   const host = new URL(server.url).host;
-  const browser = await chromium.launch({ channel: E2E.CHANNEL, headless: true, args: [WEBMCP_FLAG] });
   const outside = [];
+  let browser = null;
   try {
+    browser = await chromium.launch({ channel: E2E.CHANNEL, headless: true, args: [WEBMCP_FLAG] });
     const context = await browser.newContext();
     await context.route('**/*', (route) => {
       const url = route.request().url();
@@ -79,13 +80,16 @@ test('two phones join, the game master starts the match and a bat moves, all thr
       return Math.hypot(bat.x - before.x, bat.y - before.y) >= E2E.MOVED_MIN;
     }, 'the bat did not move');
 
-    assert.equal(await master.evaluate(() => getComputedStyle(document.getElementById('pad')).touchAction), 'none');
+    assert.equal(await master.evaluate((id) => getComputedStyle(document.getElementById(id)).touchAction, PHONE_VIEW.PAD), 'none');
     const shot = join(tmpdir(), E2E.SCREENSHOT);
     await screen.screenshot({ path: shot });
     console.log(`screenshot: ${shot}`);
     assert.deepEqual(outside, [], 'requests to another host');
   } finally {
-    await browser.close();
-    await server.close();
+    try {
+      if (browser) await browser.close();
+    } finally {
+      await server.close();
+    }
   }
 });
