@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 // No flex gap, aspect-ratio, clamp() or inset: the TV runs about Chrome 69.
 const WHITE = '#fff';
 const BLACK = '#000';
+const SMALL = '2.2vh'; // the laptop link and the sound prompt
 
 export const styles = stylex.create({
   root: { height: '100%', backgroundColor: BLACK },
@@ -30,8 +31,9 @@ export const styles = stylex.create({
   codeLabel: { margin: 0, fontSize: '3.5vh' },
   code: { margin: 0, fontSize: '12vh', fontWeight: 800, letterSpacing: '0.1em', lineHeight: 1.1 },
   url: { margin: 0, fontSize: '3.5vh' },
-  host: { margin: '0.5vh 0 0', fontSize: '2.2vh', opacity: 0.8 },
+  host: { margin: '0.5vh 0 0', fontSize: SMALL, opacity: 0.8 },
   rules: { margin: '1vh 0 0', fontSize: '3.5vh', fontWeight: 700 },
   field: { display: 'block', flex: 1, minHeight: 0, width: '100%' },
+  sound: { position: 'fixed', left: 0, right: 0, bottom: '1vh', margin: 0, fontSize: SMALL, opacity: 0.8, textAlign: 'center' },
   status: { margin: 'auto', padding: '0 5vw', fontSize: '6vh', textAlign: 'center' },
 });

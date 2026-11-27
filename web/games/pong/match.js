@@ -127,7 +127,8 @@ export function createMatch({ rng }) {
   }
 
   function view() {
-    return { phase, score: { ...score }, timeLeft, settings: { ...rules }, canStart: canStart(), winner: winner() };
+    const countdown = phase === PHASE.COUNTDOWN ? Math.ceil(timer) : null; // whole seconds left, for the 3-2-1
+    return { phase, score: { ...score }, timeLeft, settings: { ...rules }, canStart: canStart(), winner: winner(), countdown };
   }
 
   return { settings, teams, start, pause, resume, end, again, toLobby, step, view };

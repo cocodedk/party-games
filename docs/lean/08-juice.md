@@ -18,3 +18,9 @@ Anything assigned to another spec in the plan.
 
 ## Decisions
 
+- runner (2026-11-27): every constant this spec needs goes in `web/shared/constants.js` (the plan's single constants module), which is part of this spec's files even where the Files line does not list it.
+- runner (2026-11-27, the person delegated the call: "you run the show"): this spec's files also include `web/screen/main.js` (fires the sounds, attaches the unlock listener, passes freeze and countdown state to the drawing), `web/games/pong/match.js` (its `view()` may expose the countdown seconds left, asserted inside the existing countdown test), `web/screen.html` and `web/screen/styles.js`; the phones keep "Get ready" and the `state` message is unchanged; the count is `ℹ tests 48` (47 + the bundle check).
+- runner (2026-11-27, the person delegated the call: "you run the show"): the sound prompt "Click or press OK for sound" is one small line at the bottom centre of the TV, in the small type of the lobby's laptop link, shown in every phase until the first click or keydown on the screen unlocks sound, then gone for good.
+- runner (2026-11-27, the person delegated the call: "you run the show"): each team gets one colour, `TEAM_COLOR` in `web/shared/constants.js` (left `#4fc3f7` light blue, right `#ffb74d` orange); the winner line ("Left team wins") is drawn large in the winning team's colour, and a draw shows "Draw" in the field's white; player colours stay as they are.
+- runner (2026-11-27): Vite's minifier emits optional catch binding (`catch{`) for the chrome69 target, which an ES2018 parse rejects; the bundle check must allow it (Chrome 66+ supports it), for example by parsing at ecmaVersion 2019.
+

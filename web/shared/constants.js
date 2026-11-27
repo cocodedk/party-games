@@ -143,11 +143,31 @@ export const SCREEN_TEXT = {
   PAUSED: 'Paused',
   WINS: (team) => `${TEAM_NAME[team]} wins`,
   DRAW: 'Draw',
+  SOUND: 'Click or press OK for sound',
 };
+export const TEAM_COLOR = { [TEAM.LEFT]: '#4fc3f7', [TEAM.RIGHT]: '#ffb74d' }; // the winner line
+export const BUMP_BLINK_MS = 100; // a frozen bat swaps to LINE_COLOR and back at this period
+export const SCORE_POP = { MS: 600, GROW: 0.4 }; // a team's score grows by GROW of its size after a goal, shrinking back over MS
+// WebAudio bleeps: per sound, notes of [frequency Hz, start s, length s].
+export const SOUND_NAME = { HIT: 'hit', WALL: 'wall', GOAL: 'goal', WIN: 'win' };
+export const EVENT_SOUND = { [EVENT.HIT]: SOUND_NAME.HIT, [EVENT.WALL]: SOUND_NAME.WALL }; // stepWorld events that bleep
+export const UNLOCK_EVENTS = ['click', 'keydown']; // any click or remote key on the screen unlocks sound
+export const SOUND = {
+  [SOUND_NAME.HIT]: [[660, 0, 0.08]],
+  [SOUND_NAME.WALL]: [[330, 0, 0.06]],
+  [SOUND_NAME.GOAL]: [[523, 0, 0.2], [659, 0.15, 0.2], [784, 0.3, 0.2], [1047, 0.45, 0.35]],
+  [SOUND_NAME.WIN]: [[523, 0, 0.25], [659, 0.25, 0.25], [784, 0.5, 0.25], [1047, 0.75, 0.25], [784, 1, 0.25], [1047, 1.25, 0.75]],
+};
+export const SOUND_WAVE = 'square';
+export const SOUND_GAIN = 0.15; // peak volume of a note
+export const SOUND_SILENT = 0.0001; // the envelope's floor (an exponential ramp cannot reach 0)
 export const SERVE_SPEED = 7; // field units per second
 export const SERVE_ANGLE_MAX = 0.4; // radians either side of straight across
 export const BUMP_BUZZ_MS = 150; // phone vibration when its bat bumps a teammate
-export const HUD = { SCORE_Y: 0.9, SCORE_SIZE: 1.1, CLOCK_Y: 1.8, CLOCK_SIZE: 0.6, LABEL_SIZE: 1.3, LABEL_OUTLINE: 0.2 }; // field units; LABEL_OUTLINE: per font size
+export const HUD = { // field units; LABEL_OUTLINE: per font size
+  SCORE_Y: 0.9, SCORE_SIZE: 1.1, SCORE_GAP: 0.9, CLOCK_Y: 1.8, CLOCK_SIZE: 0.6,
+  LABEL_SIZE: 1.3, COUNTDOWN_SIZE: 3, WINNER_SIZE: 1.5, LABEL_OUTLINE: 0.2,
+};
 export const CLOCK_SECONDS_DIGITS = 2; // the clock shows m:ss
 
 // Match rules (web/games/pong/match.js). Times in seconds.
