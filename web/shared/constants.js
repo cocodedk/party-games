@@ -33,7 +33,21 @@ export const MSG = {
   INPUT: 'input',
   BUZZ: 'buzz',
   CLOSED: 'closed',
+  HOST: 'host',
+  ROLE: 'role',
+  STATE: 'state',
+  SETTINGS: 'settings',
+  START: 'start',
+  PAUSE: 'pause',
+  RESUME: 'resume',
+  END: 'end',
+  AGAIN: 'again',
+  LOBBY: 'lobby',
 };
+// Game-master commands, relayed to the screen only from the room's current game master.
+export const MASTER_COMMANDS = [MSG.SETTINGS, MSG.START, MSG.PAUSE, MSG.RESUME, MSG.END, MSG.AGAIN, MSG.LOBBY];
+export const MASTER_HOST = 'host'; // rooms.master() when a /host page is game master
+export const HOST_ID_PREFIX = 'h'; // host ids, kept apart from the numeric phone ids
 
 export const MESSAGE_MAX_BYTES = 1024;
 
@@ -41,7 +55,8 @@ export const DEFAULT_PORT = 8080;
 export const LOCALHOST = 'localhost';
 export const QR_PATH = '/qr.svg';
 export const SITE_ROOT = 'dist';
-export const PAGES = { '/': 'index.html', '/screen': 'screen.html', '/host': 'host.html' };
+export const HOST_PATH = '/host';
+export const PAGES = { '/': 'index.html', '/screen': 'screen.html', [HOST_PATH]: 'host.html' };
 export const PORT_ENV = 'PORT'; // npm start listens on this environment variable's port, else DEFAULT_PORT
 export const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -90,6 +105,20 @@ export const PHONE_TEXT = {
   JOINING: 'Joining…',
   TEAM: (label) => `${label} team`,
   SCREEN_LEFT: 'The game screen closed',
+  GET_READY: 'Get ready',
+  SCORE: (left, right) => `${left} – ${right}`,
+  WAITING: 'Waiting for the game master',
+  LESS: '−',
+  MORE: '+',
+  START: 'Start',
+  PAUSE: 'Pause',
+  RESUME: 'Resume',
+  END: 'End game',
+  AGAIN: 'Play again',
+  LOBBY: 'Back to lobby',
+  CONNECT: 'Connect',
+  CONNECTING: 'Connecting…',
+  ROOM: (code) => `Room ${code} · Game master`,
   DROPPED: 'Lost the connection to the game. Check that your phone is on the same Wi-Fi as the game.',
   ERROR: {
     [JOIN_ERROR.NO_ROOM]: 'No game uses that room code. Check the code on the game screen.',
@@ -103,11 +132,40 @@ export const PHONE_TEXT = {
 export const DPR_MAX = 1.5; // canvas pixels per CSS pixel, capped for cheap drawing on a TV
 export const TEAM_NAME = { [TEAM.LEFT]: 'Left team', [TEAM.RIGHT]: 'Right team' };
 export const FIELD_COLOR = '#000';
-export const LINE_COLOR = '#fff';
+export const LINE_COLOR = '#fff'; // field lines, ball and match text
 export const LINE_WIDTH = 0.06; // field lines, in field units
 export const MIDLINE_DASH = [0.3, 0.3]; // dash and gap, in field units
 export const SCREEN_TEXT = {
   STARTING: 'Starting…',
   EMPTY_TEAM: 'Scan the code to join',
   LOST: 'Lost the connection to the game server. Reload this page.',
+  HOST: (url) => `On a laptop? Run the game from ${url}`,
+  PAUSED: 'Paused',
+  WINS: (team) => `${TEAM_NAME[team]} wins`,
+  DRAW: 'Draw',
+};
+export const SERVE_SPEED = 7; // field units per second
+export const SERVE_ANGLE_MAX = 0.4; // radians either side of straight across
+export const BUMP_BUZZ_MS = 150; // phone vibration when its bat bumps a teammate
+export const HUD = { SCORE_Y: 0.9, SCORE_SIZE: 1.1, CLOCK_Y: 1.8, CLOCK_SIZE: 0.6, LABEL_SIZE: 1.3, LABEL_OUTLINE: 0.2 }; // field units; LABEL_OUTLINE: per font size
+export const CLOCK_SECONDS_DIGITS = 2; // the clock shows m:ss
+
+// Match rules (web/games/pong/match.js). Times in seconds.
+export const PHASE = {
+  LOBBY: 'lobby', COUNTDOWN: 'countdown', PLAYING: 'playing', GOAL: 'goal', PAUSED: 'paused', OVER: 'over',
+};
+export const MATCH_MODE = { TIME: 'time', SCORE: 'score' };
+export const MATCH_RANGE = { [MATCH_MODE.TIME]: { min: 1, max: 10 }, [MATCH_MODE.SCORE]: { min: 1, max: 20 } }; // minutes, points
+export const MATCH_DEFAULTS = { mode: MATCH_MODE.SCORE, value: 5 };
+export const COUNTDOWN_S = 3;
+export const GOAL_PAUSE_S = 1.5; // after a goal, before the next serve
+export const MATCH_DT_MAX = 0.1; // longest step the match clock takes, so a stalled tab does not skip time
+export const S_PER_MIN = 60;
+export const CHANGE = { PHASE: 'phase', SERVE: 'serve' }; // step() changes: {type: PHASE, phase} / {type: SERVE, toward: team}
+export const FIRST_SERVE_LEFT_BELOW = 0.5; // rng() below this serves first toward the left team
+export const DRAW = 'draw'; // view().winner when a match ends level
+export const MODE_TEXT = { [MATCH_MODE.TIME]: 'Time', [MATCH_MODE.SCORE]: 'Goals' }; // the phone's mode toggle
+export const RULES_TEXT = { // the lobby's line for the chosen settings
+  [MATCH_MODE.TIME]: (value) => `Play for ${value} ${value === 1 ? 'minute' : 'minutes'}`,
+  [MATCH_MODE.SCORE]: (value) => `First to ${value} ${value === 1 ? 'goal' : 'goals'} wins`,
 };

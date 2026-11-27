@@ -11,6 +11,6 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
     target: 'chrome69',
-    rollupOptions: { input: { index: page('index'), screen: page('screen') } },
+    rollupOptions: { input: { index: page('index'), screen: page('screen'), host: page('host') } },
   },
 });

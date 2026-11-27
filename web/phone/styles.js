@@ -89,4 +89,26 @@ export const styles = stylex.create({
     transition: 'opacity 0.4s',
   },
   hintGone: { opacity: 0 },
+  // Game-master controls and the phase line (controls.js).
+  status: { margin: '8px 0 0', minHeight: '1.2em', fontSize: '32px', fontWeight: 800 },
+  panel: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: '12px', pointerEvents: 'none' }, // touches beside the buttons reach the pad
+  row: { display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '6px 0' },
+  control: {
+    fontFamily: INHERIT,
+    margin: '0 5px',
+    padding: '12px 16px',
+    fontSize: '22px',
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+    pointerEvents: 'auto',
+    border: '3px solid currentColor', // white on the black /host page, black on a selected button
+    borderRadius: RADIUS,
+    backgroundColor: BLACK,
+    color: WHITE,
+  },
+  wide: { flex: 1, padding: '12px 4px', fontSize: '20px' },
+  small: { padding: '8px 14px', fontSize: '18px' },
+  on: { backgroundColor: WHITE, color: BLACK },
+  off: { opacity: 0.4 },
+  text: { margin: '6px 0', fontSize: '22px', fontWeight: 700 },
 });

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRooms } from '../server/rooms.js';
 import {
-  ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, MAX_PER_TEAM, NAME_MAX, TEAM, JOIN_ERROR,
+  ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, MAX_PER_TEAM, NAME_MAX, TEAM, JOIN_ERROR, MASTER_HOST,
 } from '../web/shared/constants.js';
 
 const CREATES = 200;
@@ -62,4 +62,35 @@ test('an empty or 17-character name is bad-name', () => {
   assert.deepEqual(rooms.join(code, { name: '   ', team: TEAM.LEFT }), bad);
   assert.deepEqual(rooms.join(code, { name: 'x'.repeat(NAME_MAX + 1), team: TEAM.LEFT }), bad);
   assert.equal(rooms.join(code, { name: 'x'.repeat(NAME_MAX), team: TEAM.LEFT }).ok, true);
+});
+
+test('the first phone is master; a room without phones has none', () => {
+  const rooms = createRooms();
+  const code = rooms.create();
+  assert.equal(rooms.master(code), undefined);
+  const a = rooms.join(code, { name: 'Ann', team: TEAM.LEFT });
+  rooms.join(code, { name: 'Bo', team: TEAM.RIGHT });
+  assert.equal(rooms.master(code), a.id);
+  assert.equal(rooms.master('ZZZZ'), undefined);
+});
+
+test('the master leaving passes the role to the next phone in join order', () => {
+  const rooms = createRooms();
+  const code = rooms.create();
+  const [a, b, c] = ['Ann', 'Bo', 'Cy'].map((name) => rooms.join(code, { name, team: TEAM.LEFT }));
+  rooms.leave(code, b.id);
+  assert.equal(rooms.master(code), a.id);
+  rooms.leave(code, a.id);
+  assert.equal(rooms.master(code), c.id);
+  assert.deepEqual(rooms.host('ZZZZ'), { ok: false, reason: JOIN_ERROR.NO_ROOM });
+  const h1 = rooms.host(code);
+  const h2 = rooms.host(code);
+  assert.equal(h1.ok, true);
+  assert.equal(rooms.master(code), MASTER_HOST);
+  assert.deepEqual(rooms.get(code).hosts, [h1.id, h2.id]);
+  rooms.leave(code, h2.id);
+  assert.deepEqual(rooms.get(code).hosts, [h1.id]);
+  rooms.leave(code, h1.id);
+  assert.equal(rooms.master(code), c.id);
+  rooms.leave('ZZZZ', c.id);
 });

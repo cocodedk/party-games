@@ -48,6 +48,7 @@ test('ball leaving the left edge is a goal for the right team', () => {
   assert.deepEqual(stepWorld(world, DT), [{ type: EVENT.GOAL, side: TEAM.RIGHT }]);
   const right = { ball: ball(FIELD_W + BALL_RADIUS - 0.01, 4, SPEED, 0), bats: [] };
   assert.deepEqual(stepWorld(right, DT), [{ type: EVENT.GOAL, side: TEAM.LEFT }]);
+  assert.deepEqual(stepWorld({ ball: null, bats: [] }, DT), []); // no ball, no goal
 });
 
 test('head-on hit reflects about the bat normal', () => {
@@ -140,7 +141,7 @@ test('overlapping teammates bump: pushed apart and both frozen for BUMP_FREEZE_M
     [bat('a', 0.125, 4.5, 0), bat('b', 0.2, 4.5, 0)],
   ];
   for (const [p, q] of cases) {
-    const w = { ball: ball(8, 1, 0, 0), bats: [p, q], now };
+    const w = { ball: null, bats: [p, q], now }; // no ball (outside playing): bats still bump
     assert.ok(types(stepWorld(w, DT)).includes(EVENT.BUMP));
     assert.ok(batGap(p, q) >= BAT_THICKNESS - EPS, `${p.x},${q.x} gap ${batGap(p, q)}`);
     assert.equal(p.frozenUntil, now + BUMP_FREEZE_MS);
