@@ -3,7 +3,7 @@
 // successive movement directions, so a straight drag keeps a and a circle adds about 2 pi.
 import { PAD_MIN_MOVE } from '../shared/constants.js';
 
-const unit = (v) => Math.min(1, Math.max(0, v));
+export const unit = (v) => Math.min(1, Math.max(0, v));
 
 export function createPad() {
   let a = 0;
