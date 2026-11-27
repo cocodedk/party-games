@@ -31,7 +31,7 @@ function playing({ mode = MATCH_DEFAULTS.mode, value = MATCH_DEFAULTS.value, rng
 test('start is refused with an empty team; settings ignore bad modes and values', () => {
   const match = createMatch({ rng: () => 0 });
   assert.deepEqual(match.view(), {
-    phase: PHASE.LOBBY, score: { left: 0, right: 0 }, timeLeft: null, settings: MATCH_DEFAULTS, canStart: false, winner: null,
+    phase: PHASE.LOBBY, score: { left: 0, right: 0 }, timeLeft: null, settings: MATCH_DEFAULTS, canStart: false, winner: null, countdown: null,
   });
   for (const [mode, value] of [['speed', 3], [MATCH_MODE.TIME, 2.5], [MATCH_MODE.TIME, '3'], [MATCH_MODE.TIME, 0],
     [MATCH_MODE.TIME, MATCH_RANGE.time.max + 1], [MATCH_MODE.SCORE, MATCH_RANGE.score.max + 1], ['constructor', 1]]) {
@@ -54,8 +54,11 @@ test('the countdown lasts 3 s, then playing with a serve', () => {
   const match = createMatch({ rng: () => 0 });
   match.start(BOTH);
   assert.equal(match.view().phase, PHASE.COUNTDOWN);
+  assert.equal(match.view().countdown, COUNTDOWN_S);
   assert.deepEqual(run(match, COUNTDOWN_S - DT), []);
+  assert.equal(match.view().countdown, 1);
   assert.deepEqual(match.step(DT), [{ type: CHANGE.PHASE, phase: PHASE.PLAYING }, { type: CHANGE.SERVE, toward: TEAM.LEFT }]);
+  assert.equal(match.view().countdown, null);
 });
 
 test('a goal scores +1, holds phase goal for 1.5 s, then serves toward the team that conceded', () => {

@@ -1,8 +1,9 @@
 // Canvas drawing of the field, bats, ball and match text, scaled to fit the canvas with the device-pixel ratio capped.
 import { batEnds } from './bat.js';
+import { frozen } from './bumps.js';
 import {
   FIELD_W, FIELD_H, BAT_THICKNESS, DPR_MAX, FIELD_COLOR, LINE_COLOR, LINE_WIDTH, MIDLINE_DASH, BALL_RADIUS,
-  HUD, S_PER_MIN, CLOCK_SECONDS_DIGITS, TEAM,
+  HUD, S_PER_MIN, CLOCK_SECONDS_DIGITS, TEAM, TEAMS, BUMP_BLINK_MS,
 } from '../../shared/constants.js';
 
 /** Matches the canvas buffer to its CSS size (DPR capped) and returns the field-to-pixel transform. */
@@ -14,8 +15,11 @@ export function fit(canvas) {
   return { scale, x: (canvas.width - FIELD_W * scale) / 2, y: (canvas.height - FIELD_H * scale) / 2 };
 }
 
-/** hud: null (lobby) or {score, timeLeft (s or null), label (centre text or null)}. */
-export function draw(ctx, view, bats, ball, hud) {
+/**
+ * now: the world's clock (ms), for the frozen bats' blink.
+ * hud: null (lobby) or {score, timeLeft (s or null), label ({text, size, color} or null), grow ({team: extra size share})}.
+ */
+export function draw(ctx, view, bats, ball, hud, now) {
   const { canvas } = ctx;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = FIELD_COLOR;
@@ -37,7 +41,8 @@ export function draw(ctx, view, bats, ball, hud) {
   ctx.lineWidth = BAT_THICKNESS;
   for (const bat of bats) {
     const [a, b] = batEnds(bat);
-    ctx.strokeStyle = bat.color;
+    const blink = frozen(bat, now) && Math.floor((bat.frozenUntil - now) / BUMP_BLINK_MS) % 2 === 1;
+    ctx.strokeStyle = blink ? LINE_COLOR : bat.color;
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(b.x, b.y);
@@ -59,14 +64,14 @@ function clock(seconds) {
 }
 
 // Text in canvas pixels (fractional font sizes under the field transform render poorly), in the page's font.
-function drawHud(ctx, view, { score, timeLeft, label }) {
+function drawHud(ctx, view, { score, timeLeft, label, grow }) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = LINE_COLOR;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const text = (str, y, size, backed) => {
+  const text = (str, y, size, backed, dx = 0) => {
     const px = Math.round(size * view.scale);
-    const [cx, cy] = [view.x + (FIELD_W / 2) * view.scale, view.y + y * view.scale];
+    const [cx, cy] = [view.x + (FIELD_W / 2 + dx) * view.scale, view.y + y * view.scale];
     ctx.font = `bold ${px}px ${getComputedStyle(ctx.canvas).fontFamily}`;
     if (backed) { // a field-coloured outline keeps the midline off the centre label
       ctx.save();
@@ -78,7 +83,13 @@ function drawHud(ctx, view, { score, timeLeft, label }) {
     }
     ctx.fillText(str, cx, cy);
   };
-  text(`${score[TEAM.LEFT]}   ${score[TEAM.RIGHT]}`, HUD.SCORE_Y, HUD.SCORE_SIZE);
+  for (const team of TEAMS) {
+    const side = team === TEAM.LEFT ? -1 : 1;
+    text(String(score[team]), HUD.SCORE_Y, HUD.SCORE_SIZE * (1 + grow[team]), false, side * HUD.SCORE_GAP);
+  }
   if (timeLeft !== null) text(clock(timeLeft), HUD.CLOCK_Y, HUD.CLOCK_SIZE);
-  if (label) text(label, FIELD_H / 2, HUD.LABEL_SIZE, true);
+  if (label) {
+    ctx.fillStyle = label.color;
+    text(label.text, FIELD_H / 2, label.size, true);
+  }
 }
