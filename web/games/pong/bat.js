@@ -10,7 +10,7 @@ const EASE_RATE = -Math.log(1 - BAT_EASE_REACHED) / (BAT_EASE_MS / MS_PER_S);
 const left = (team) => (team === TEAM.LEFT ? 0 : HALF_W);
 const dirOf = (a) => ({ x: -Math.sin(a), y: Math.cos(a) });
 
-function clamp(bat) {
+export function clamp(bat) {
   const d = dirOf(bat.a);
   const ex = Math.abs(d.x) * BAT_LENGTH / 2 + BAT_THICKNESS / 2;
   const ey = Math.abs(d.y) * BAT_LENGTH / 2 + BAT_THICKNESS / 2;
