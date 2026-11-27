@@ -33,7 +33,21 @@ export const MSG = {
   INPUT: 'input',
   BUZZ: 'buzz',
   CLOSED: 'closed',
+  HOST: 'host',
+  ROLE: 'role',
+  STATE: 'state',
+  SETTINGS: 'settings',
+  START: 'start',
+  PAUSE: 'pause',
+  RESUME: 'resume',
+  END: 'end',
+  AGAIN: 'again',
+  LOBBY: 'lobby',
 };
+// Game-master commands, relayed to the screen only from the room's current game master.
+export const MASTER_COMMANDS = [MSG.SETTINGS, MSG.START, MSG.PAUSE, MSG.RESUME, MSG.END, MSG.AGAIN, MSG.LOBBY];
+export const MASTER_HOST = 'host'; // rooms.master() when a /host page is game master
+export const HOST_ID_PREFIX = 'h'; // host ids, kept apart from the numeric phone ids
 
 export const MESSAGE_MAX_BYTES = 1024;
 

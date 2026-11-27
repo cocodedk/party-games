@@ -1,5 +1,5 @@
 import {
-  ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, TEAMS, MAX_PER_TEAM, NAME_MAX, PLAYER_COLORS, JOIN_ERROR,
+  ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, TEAMS, MAX_PER_TEAM, NAME_MAX, PLAYER_COLORS, JOIN_ERROR, MASTER_HOST, HOST_ID_PREFIX,
 } from '../web/shared/constants.js';
 
 function randomCode() {
@@ -10,7 +10,7 @@ function randomCode() {
   return code;
 }
 
-/** In-memory room state: code → { players: Map(id → {id, name, team, color}) }. */
+/** In-memory room state: code → { hosts: [host id], players: Map(id → {id, name, team, color}) }, both in join order. */
 export function createRooms() {
   const rooms = new Map();
   let nextId = 1;
@@ -18,7 +18,7 @@ export function createRooms() {
   function create() {
     let code;
     do code = randomCode(); while (rooms.has(code));
-    rooms.set(code, { players: new Map() });
+    rooms.set(code, { hosts: [], players: new Map() });
     return code;
   }
 
@@ -39,8 +39,28 @@ export function createRooms() {
     return { ok: true, id, color };
   }
 
+  /** Adds a connected /host page; the most recent one still connected is game master. */
+  function host(code) {
+    const room = rooms.get(code);
+    if (!room) return { ok: false, reason: JOIN_ERROR.NO_ROOM };
+    const id = HOST_ID_PREFIX + nextId++;
+    room.hosts.push(id);
+    return { ok: true, id };
+  }
+
+  /** MASTER_HOST if a host is connected (the game master is then room.hosts.at(-1)), else the first phone in join order. */
+  function master(code) {
+    const room = rooms.get(code);
+    if (!room) return undefined;
+    return room.hosts.length ? MASTER_HOST : room.players.keys().next().value;
+  }
+
+  /** Removes a phone or a host by id. */
   function leave(code, id) {
-    rooms.get(code)?.players.delete(id);
+    const room = rooms.get(code);
+    if (!room) return;
+    room.hosts = room.hosts.filter((h) => h !== id);
+    room.players.delete(id);
   }
 
   function remove(code) {
@@ -51,5 +71,5 @@ export function createRooms() {
     return rooms.get(code);
   }
 
-  return { create, join, leave, remove, get };
+  return { create, join, host, master, leave, remove, get };
 }

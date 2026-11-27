@@ -74,6 +74,63 @@ test('screen create gets created with the join base; a phone join reaches the sc
   assert.deepEqual(await screen.next(), { type: MSG.LEFT, id: joined.id });
 });
 
+async function host(url, room) {
+  const client = await connect(url);
+  client.send(MSG.HOST, { room });
+  return { host: client, joined: await client.next() };
+}
+
+const STATE = { phase: 'lobby', score: { left: 0, right: 0 }, timeLeft: 0, settings: { mode: 'score', value: 5 }, canStart: true };
+
+test('a host joining makes the host master and the phone not; a second host takes over; commands relay only from the master', async (t) => {
+  const { url, screen, room, phone, joined } = await roomWithPhone(t);
+  assert.equal(joined.isMaster, true);
+  phone.send(MSG.SETTINGS, { mode: 'time', value: 3, extra: 1 });
+  assert.deepEqual(await screen.next(), { type: MSG.SETTINGS, mode: 'time', value: 3 });
+  assert.deepEqual((await host(url, 'NOPE')).joined, { type: MSG.ERROR, reason: JOIN_ERROR.NO_ROOM });
+  const first = await host(url, room);
+  assert.deepEqual(first.joined, { type: MSG.JOINED, isMaster: true });
+  assert.deepEqual(await phone.next(), { type: MSG.ROLE, isMaster: false });
+  first.host.send(MSG.HOST, { room });
+  phone.send(MSG.START);
+  phone.send(MSG.STATE, { ...STATE, phase: 'over' });
+  phone.send(MSG.INPUT, { x: 0, y: 0, a: 0 });
+  assert.equal((await screen.next()).type, MSG.INPUT);
+  const second = await host(url, room);
+  assert.deepEqual(await first.host.next(), { type: MSG.ROLE, isMaster: false });
+  first.host.send(MSG.END);
+  first.host.send(MSG.STATE, { ...STATE, phase: 'over' });
+  for (const type of [MSG.INPUT, MSG.PAUSE]) second.host.send(type, { x: 0, y: 0, a: 0 }); // a host's input is dropped
+  assert.deepEqual(await screen.next(), { type: MSG.PAUSE });
+  screen.send(MSG.STATE, { ...STATE, extra: 1 });
+  for (const peer of [phone, first.host, second.host]) assert.deepEqual(await peer.next(), { type: MSG.STATE, ...STATE });
+});
+
+test('the host leaving returns the role to the previous host, then the first phone; late joiners get the state; hosts get closed', async (t) => {
+  const { url, screen, room, phone } = await roomWithPhone(t);
+  const bo = await join(url, room, 'Bo', TEAM.RIGHT);
+  screen.send(MSG.STATE, STATE);
+  for (const peer of [phone, bo.phone]) await peer.next();
+  const first = await host(url, room);
+  assert.deepEqual(await first.host.next(), { type: MSG.STATE, ...STATE });
+  await phone.next();
+  const second = await host(url, room);
+  await Promise.all([second.host.next(), first.host.next()]);
+  second.host.ws.close();
+  assert.deepEqual(await first.host.next(), { type: MSG.ROLE, isMaster: true });
+  first.host.ws.close(); // the phone's next message is this role: it got none when the first host took the role back
+  assert.deepEqual(await phone.next(), { type: MSG.ROLE, isMaster: true });
+  phone.ws.close();
+  assert.deepEqual(await bo.phone.next(), { type: MSG.ROLE, isMaster: true });
+  const cy = await join(url, room, 'Cy');
+  assert.equal(cy.joined.isMaster, false);
+  assert.deepEqual(await cy.phone.next(), { type: MSG.STATE, ...STATE });
+  const last = await host(url, room);
+  await Promise.all([last.host.next(), bo.phone.next()]);
+  screen.ws.close();
+  assert.deepEqual(await last.host.next(), { type: MSG.CLOSED });
+});
+
 test('phone input reaches the screen with the phone id; screen input and a second create or join are ignored', async (t) => {
   const { screen, room, phone, joined } = await roomWithPhone(t);
   screen.send(MSG.CREATE);
