@@ -67,6 +67,16 @@ export const BAT_EASE_MS = 80; // time to cover BAT_EASE_REACHED of the way to t
 export const BAT_EASE_REACHED = 0.95;
 export const MS_PER_S = 1000;
 
+// Ball and collisions. Speeds are field units per second.
+export const BALL_RADIUS = 0.2;
+export const BALL_MAX = 24;
+export const BALL_HIT_SPEEDUP = 1.05; // speed factor per bat hit
+export const BAT_SWING_SHARE = 0.5; // part of the bat's contact-point velocity added to the ball
+export const BUMP_FREEZE_MS = 1000; // teammates that collide ignore their phones this long
+export const BUMP_SEPARATE_TRIES = 16; // most push-apart rounds over all teammate pairs per substep
+export const WALL_FREE_STEPS = 20; // bisection steps that slide a pinned ball along the wall out of a bat
+export const EVENT = { WALL: 'wall', HIT: 'hit', GOAL: 'goal', BUMP: 'bump' };
+
 // Pad: finger segments shorter than this (px) are jitter and do not turn the bat.
 export const PAD_MIN_MOVE = 2;
 
