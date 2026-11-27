@@ -1,5 +1,5 @@
 // WebMCP: tool names and the texts an agent reads. Extended by the page tools (screen, phone, game master).
-import { MATCH_MODE, MATCH_RANGE, NAME_MAX, FIELD_W, FIELD_H } from './constants.js';
+import { MATCH_MODE, MATCH_RANGE, NAME_MAX, FIELD_W, FIELD_H, TEAM } from './constants.js';
 
 export const NO_INPUT = { type: 'object', properties: {} }; // inputSchema of a tool that takes nothing
 export const READ_ONLY = { readOnlyHint: true };
@@ -78,3 +78,19 @@ export const WEBMCP_ERROR = {
   NOT_NOW: 'That button is not on the game master\'s screen right now (wrong phase, or not enough players).',
   BAD_VALUE: 'value must be a whole number in the range for the mode.',
 };
+
+// The end-to-end proof (e2e/play.e2e.js): a real Chrome with WebMCP switched on, driven through the tools only.
+export const WEBMCP_FLAG = '--enable-features=WebMCP';
+export const E2E = {
+  CHANNEL: 'chrome',
+  NAMES: { [TEAM.LEFT]: 'Ann', [TEAM.RIGHT]: 'Bo' },
+  RULES: { mode: MATCH_MODE.TIME, value: 1 },
+  MOVE: { x: 1, y: 0, angle: 0.5 }, // the left bat to the top of the centre line
+  MOVED_MIN: 1, // field units the bat must travel to count as moved
+  WAIT_MS: 15000, // longest wait for a tool to appear or the page to reach a state
+  POLL_MS: 100,
+  SCREENSHOT: 'team-pong-screen.png', // written to the system's temp folder
+};
+
+// The dist/ scan (tests/dist-scan.test.js): no URL in the build may point anywhere but the page's own server.
+export const URL_PATTERN = /https?:\/\/[^\s"'`<>()]+/g;

@@ -1,0 +1,34 @@
+# Team Pong
+
+> A party Pong game: the TV shows the field, every player's phone is a bat, teams of up to four play left against right.
+
+The pages declare WebMCP tools (document.modelContext.registerTool), so an AI agent in the visitor's browser can use them
+instead of the buttons. Today that works in Chrome with WebMCP switched on (chrome://flags/#enable-webmcp-testing).
+
+## Pages
+
+- /screen: the TV screen with the field, the room code and the score.
+- /: the phone page, a join form and then the bat pad; the game master's phone also has the match controls.
+- /host: the game-master controls for a laptop, without a bat.
+
+## Tools on /screen
+
+- describe: what the TV screen shows and which tools it has.
+- get_state: the room code, teams with player names, score, phase, seconds left and every bat's position.
+
+## Tools on / (the phone page)
+
+- describe: which part of the page shows now (join form, bat pad or lost connection) and the tools it offers.
+- join {room, name, team}: join the room on the TV, as the Join button does.
+- move_bat {x, y, angle}: move this player's bat, as a finger on the pad does; out-of-range values are clamped.
+
+## Game-master tools (the game master's phone and /host, only while it is game master)
+
+- set_rules {mode, value}: choose a timed match ("time", minutes) or first to a number of goals ("score").
+- start: start the match, as the Start button does.
+- pause: pause the match, or resume it when paused.
+- end: end the match now and show the winner.
+
+## Tools on /host
+
+- describe: what the page shows now, whether it is game master, and the tools it offers.
