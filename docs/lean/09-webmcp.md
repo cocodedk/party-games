@@ -31,3 +31,9 @@ Anything assigned to another spec in the plan.
 
 ## Decisions
 
+- runner (2026-11-27): every constant this spec needs goes in `web/shared/constants.js` (the plan's single constants module), which is part of this spec's files even where the Files line does not list it.
+- runner (2026-11-27, the person delegated the call: "you run the show"): `web/shared/constants.js` is near the 200-line limit, so this spec's WebMCP constants (tool names, descriptions, error texts, e2e and dist-scan values) go in one second constants module, `web/shared/webmcp-constants.js`, imported the same way; nothing else moves.
+- runner (2026-11-27, the person delegated the call: "you run the show"): this spec's files also include `web/phone/controls.js`, `web/phone/main.js`, `web/host/main.js` and `web/screen/main.js` (the tools share the buttons' and the pad's code paths), and the coverage exclusions in `package.json`'s `test` script for any new DOM glue file.
+- runner (2026-11-27, the person delegated the call: "you run the show"): the proposed tool list is the one to build: `/screen` `describe`, `get_state`; phone `describe`, `join`, `move_bat`; master phone and `/host` `set_rules`, `start`, `pause`, `end`.
+- runner (2026-11-27, the person delegated the call: "you run the show"): `/host` also gets a `describe` tool (every page declares one), registered whether or not it is game master.
+- runner (2026-11-27, the person delegated the call: "you run the show"): `get_state` also returns each player's bat position (`x`, `y`, `angle` with the player's id and team), so the e2e can assert the bat moved.

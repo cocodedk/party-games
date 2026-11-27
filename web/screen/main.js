@@ -8,6 +8,7 @@ import { frozen } from '../games/pong/bumps.js';
 import { createMatch } from '../games/pong/match.js';
 import { fit, draw } from '../games/pong/render.js';
 import { createSound } from '../games/pong/sound.js';
+import { registerScreenTools } from './tools.js';
 import {
   MSG, NET_EVENT, WS_PATH, MS_PER_S, SCREEN_TEXT, TEAM, TEAMS, EVENT, PHASE, CHANGE, DRAW, MATCH_DT_MAX,
   SERVE_SPEED, SERVE_ANGLE_MAX, BUMP_BUZZ_MS, HUD, LINE_COLOR, TEAM_COLOR, SCORE_POP, SOUND_NAME,
@@ -31,6 +32,7 @@ let frame = 0;
 let sent = ''; // the last state sent, as JSON
 let laidOut = ''; // the lobby band's visibility and rules last shown, as JSON
 let net = null;
+let room = null; // the room code, once the server has made the room
 
 function resize() {
   view = fit(canvas);
@@ -128,12 +130,15 @@ function unlock() {
 }
 for (const type of UNLOCK_EVENTS) window.addEventListener(type, unlock);
 
+registerScreenTools(() => ({ room, view: match.view(), bats: [...world.bats.values()] }));
+
 net = connect(WS_PATH);
 net.on(NET_EVENT.OPEN, () => net.send(MSG.CREATE));
 net.on(NET_EVENT.CLOSE, lost);
-net.on(MSG.CREATED, ({ room, base }) => {
+net.on(MSG.CREATED, (msg) => {
+  room = msg.room;
   status.hidden = true;
-  lobby.show(room, base);
+  lobby.show(room, msg.base);
   apply(canvas, styles.field);
   canvas.hidden = false;
   window.addEventListener('resize', resize);
@@ -142,7 +147,7 @@ net.on(MSG.CREATED, ({ room, base }) => {
   frame = requestAnimationFrame(tick);
 });
 net.on(MSG.PLAYER, (player) => {
-  world.bats.set(player.id, createBat(player));
+  world.bats.set(player.id, Object.assign(createBat(player), { name: player.name }));
   lobby.add(player);
   teams();
 });

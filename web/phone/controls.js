@@ -1,6 +1,8 @@
 // The phase line and the game-master controls over a pad (the phone, and /host in 075): DOM only, no pad in here.
 import { apply } from '../shared/dom.js';
 import { styles } from './styles.js';
+import { createMasterTools } from './master-tools.js';
+import { TOOL } from '../shared/webmcp-constants.js';
 import { MSG, PHASE, MATCH_MODE, MATCH_RANGE, RULES_TEXT, MODE_TEXT, TEAM, PHONE_TEXT, SCREEN_TEXT } from '../shared/constants.js';
 
 const ACTIVE = [PHASE.COUNTDOWN, PHASE.PLAYING, PHASE.GOAL, PHASE.PAUSED];
@@ -30,6 +32,7 @@ function statusText({ phase, score }) {
 export function createControls(root, send, padless = false) {
   let state = null; // the last state, or null before the first
   let master = false;
+  let shown = {}; // which boxes render() shows
 
   const button = (text, looks, onClick) => {
     const b = make('button', [styles.control, ...looks]);
@@ -49,6 +52,13 @@ export function createControls(root, send, padless = false) {
     const { min, max } = MATCH_RANGE[mode];
     send(MSG.SETTINGS, { mode, value: Math.min(max, Math.max(min, value)) });
   };
+  // One code path per command, shared by the buttons and the WebMCP tools.
+  const act = {
+    [TOOL.SET_RULES]: ({ mode, value }) => settings(mode, value),
+    [TOOL.START]: () => send(MSG.START),
+    [TOOL.PAUSE]: () => send(state.phase === PHASE.PAUSED ? MSG.RESUME : MSG.PAUSE),
+    [TOOL.END]: () => send(MSG.END),
+  };
   const step = (by) => () => settings(state.settings.mode, state.settings.value + by);
 
   const status = make('p', [styles.status]);
@@ -60,10 +70,10 @@ export function createControls(root, send, padless = false) {
   const rules = make('p', [styles.text]);
   const minus = button(PHONE_TEXT.LESS, [], step(-1));
   const plus = button(PHONE_TEXT.MORE, [], step(1));
-  const start = button(PHONE_TEXT.START, [styles.wide], () => send(MSG.START));
-  const pause = button(PHONE_TEXT.PAUSE, [styles.small], () => send(state.phase === PHASE.PAUSED ? MSG.RESUME : MSG.PAUSE));
+  const start = button(PHONE_TEXT.START, [styles.wide], act[TOOL.START]);
+  const pause = button(PHONE_TEXT.PAUSE, [styles.small], act[TOOL.PAUSE]);
   const again = button(PHONE_TEXT.AGAIN, [styles.wide], () => send(MSG.AGAIN));
-  const end = button(PHONE_TEXT.END, [styles.small], () => send(MSG.END));
+  const end = button(PHONE_TEXT.END, [styles.small], act[TOOL.END]);
   const boxes = {
     lobby: make('div', [], make('div', [styles.row], ...modes, minus, plus), rules, make('div', [styles.row], start)),
     match: make('div', [styles.row], pause, end),
@@ -75,6 +85,14 @@ export function createControls(root, send, padless = false) {
   root.appendChild(status);
   root.appendChild(panel);
 
+  const uses = { // each tool's button and the box it sits in
+    [TOOL.SET_RULES]: [modes[0], 'lobby'], [TOOL.START]: [start, 'lobby'], [TOOL.PAUSE]: [pause, 'match'], [TOOL.END]: [end, 'match'],
+  };
+  const tools = createMasterTools({
+    usable: (name) => Boolean(shown[uses[name][1]]) && !uses[name][0].disabled,
+    run: (name, input) => act[name](input),
+  });
+
   const enable = (b, on) => {
     b.disabled = !on;
     apply(b, styles.control, (b === start || b === again) && styles.wide, (b === pause || b === end) && styles.small, !on && styles.off);
@@ -83,7 +101,7 @@ export function createControls(root, send, padless = false) {
   function render() {
     const phase = state && state.phase;
     status.textContent = state ? statusText(state) : '';
-    const shown = {
+    shown = {
       lobby: master && phase === PHASE.LOBBY,
       match: master && ACTIVE.includes(phase),
       over: master && phase === PHASE.OVER,
@@ -114,6 +132,9 @@ export function createControls(root, send, padless = false) {
     role(isMaster) {
       master = isMaster;
       render();
+      tools.offer(isMaster);
     },
+    /** The game-master tool names this page offers now. */
+    tools: tools.names,
   };
 }
