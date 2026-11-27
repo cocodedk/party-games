@@ -54,3 +54,17 @@ export const CONTENT_TYPES = {
 };
 export const CONTENT_TYPE_BINARY = 'application/octet-stream';
 export const HTTP_STATUS = { OK: 200, NOT_FOUND: 404 };
+
+// Field in logical units (16:9); each team owns half of it.
+export const FIELD_W = 16;
+export const FIELD_H = 9;
+
+// Bat: a thick segment; angle 0 is vertical, positive turns clockwise on screen.
+export const BAT_LENGTH = 1.8;
+export const BAT_THICKNESS = 0.25;
+export const BAT_EASE_MS = 80; // time to cover BAT_EASE_REACHED of the way to the target
+export const BAT_EASE_REACHED = 0.95;
+export const MS_PER_S = 1000;
+
+// Pad: finger segments shorter than this (px) are jitter and do not turn the bat.
+export const PAD_MIN_MOVE = 2;
