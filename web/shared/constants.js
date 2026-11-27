@@ -125,3 +125,18 @@ export const SCREEN_TEXT = {
   EMPTY_TEAM: 'Scan the code to join',
   LOST: 'Lost the connection to the game server. Reload this page.',
 };
+
+// Match rules (web/games/pong/match.js). Times in seconds.
+export const PHASE = {
+  LOBBY: 'lobby', COUNTDOWN: 'countdown', PLAYING: 'playing', GOAL: 'goal', PAUSED: 'paused', OVER: 'over',
+};
+export const MATCH_MODE = { TIME: 'time', SCORE: 'score' };
+export const MATCH_RANGE = { [MATCH_MODE.TIME]: { min: 1, max: 10 }, [MATCH_MODE.SCORE]: { min: 1, max: 20 } }; // minutes, points
+export const MATCH_DEFAULTS = { mode: MATCH_MODE.SCORE, value: 5 };
+export const COUNTDOWN_S = 3;
+export const GOAL_PAUSE_S = 1.5; // after a goal, before the next serve
+export const MATCH_DT_MAX = 0.1; // longest step the match clock takes, so a stalled tab does not skip time
+export const S_PER_MIN = 60;
+export const CHANGE = { PHASE: 'phase', SERVE: 'serve' }; // step() changes: {type: PHASE, phase} / {type: SERVE, toward: team}
+export const FIRST_SERVE_LEFT_BELOW = 0.5; // rng() below this serves first toward the left team
+export const DRAW = 'draw'; // view().winner when a match ends level
