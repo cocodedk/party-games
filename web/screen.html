@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Pong</title>
+  <!-- StyleX writes all rules to this file at build time (its fallback when no other CSS exists). -->
+  <link rel="stylesheet" href="/assets/stylex.css">
+</head>
+<body>
+  <div id="lobby" hidden>
+    <section id="team-left"><h2></h2><ul></ul></section>
+    <div id="join">
+      <img id="qr" alt="Scan this QR code with your phone camera to join">
+      <div id="joinText">
+        <p id="codeLabel">Room code</p>
+        <p id="code"></p>
+        <p id="url"></p>
+      </div>
+    </div>
+    <section id="team-right"><h2></h2><ul></ul></section>
+  </div>
+  <canvas id="field" hidden></canvas>
+  <p id="status"></p>
+  <script type="module" src="./screen/main.js"></script>
+</body>
+</html>

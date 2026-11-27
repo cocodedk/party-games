@@ -42,13 +42,14 @@ async function join(url, room, name, team = TEAM.LEFT) {
 
 /** A server with a screen that created a room and has seen one phone join. */
 async function roomWithPhone(t) {
-  const { url } = await serve(t);
+  const { url, base } = await serve(t);
   const screen = await connect(url);
   screen.send(MSG.CREATE);
-  const { room } = await screen.next();
+  const created = await screen.next();
+  const { room } = created;
   const { phone, joined } = await join(url, room, 'Ann');
   const player = await screen.next();
-  return { url, screen, room, phone, joined, player };
+  return { url, base, screen, created, room, phone, joined, player };
 }
 
 function rawStatus(url, path) {
@@ -61,9 +62,10 @@ function rawStatus(url, path) {
   });
 }
 
-test('screen create gets created; a phone join reaches the screen as player, and leaving as left', async (t) => {
-  const { url, screen, room, phone, joined, player } = await roomWithPhone(t);
+test('screen create gets created with the join base; a phone join reaches the screen as player, and leaving as left', async (t) => {
+  const { url, base, screen, created, room, phone, joined, player } = await roomWithPhone(t);
   assert.match(room, /^[A-Z]{4}$/);
+  assert.deepEqual(created, { type: MSG.CREATED, room, base });
   assert.equal(joined.type, MSG.JOINED);
   assert.deepEqual(player, { type: MSG.PLAYER, id: joined.id, name: 'Ann', team: TEAM.LEFT, color: joined.color });
   const bad = await join(url, 'NOPE', 'Bo');
