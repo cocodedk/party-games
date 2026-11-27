@@ -29,6 +29,7 @@ browser and feel instant. Team Pong is the first game; the code is laid out so m
 - CPU-hungry visuals (shadows, blur, particles, filters, large textures) that stutter on a TV.
 - Noticeable lag between finger and bat.
 - Any install step for players, or any third-party resource (CDN, Google Fonts).
+- Needing the internet: the whole game must play fully offline on the local network (user, 2026-11-27).
 
 ## Decided with the user
 
@@ -41,6 +42,7 @@ browser and feel instant. Team Pong is the first game; the code is laid out so m
 - Bat control: the finger's position on the phone maps to the bat's position anywhere in the team's
   own half; circling the finger rotates the bat, which keeps its angle when the finger stops.
 - Bats stay within their team's own half.
+- Styling with StyleX (built by Vite into `dist/`).
 - Colliding teammates bounce apart and freeze for 1 second.
 - All teammates share the whole half, so bumps are frequent and part of the fun (no lanes).
 - The game ends by time or by score; the game master decides which, and the value.
@@ -58,8 +60,10 @@ browser and feel instant. Team Pong is the first game; the code is laid out so m
 
 ### Stack (builder's call, stated)
 
-Node 24, plain ES modules, no build step. Server dependencies: `ws` and `qrcode` (QR rendered as
-SVG on the server). Browser code is vanilla JS. System fonts only. Code files stay under 200 lines;
+Node 24, plain ES modules. Server dependencies: `ws` and `qrcode` (QR rendered as SVG on the server).
+Browser code is vanilla JS, styled with StyleX (user's choice, 2026-11-27), built by Vite with
+`@stylexjs/unplugin` into `dist/`, which the server serves; the build targets Chrome 69 so the TV gets
+old-browser-safe output. System fonts only. Code files stay under 200 lines;
 meaningful numbers (limits, timings, speeds, message types) live in a constants module.
 
 ### Pages
