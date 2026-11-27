@@ -24,3 +24,5 @@ Anything assigned to another spec in the plan.
 
 ## Decisions
 
+- runner (2026-11-27): every constant this spec needs goes in `web/shared/constants.js` (the plan's single constants module), which is part of this spec's files even where the Files line does not list it.
+
