@@ -68,3 +68,22 @@ export const MS_PER_S = 1000;
 
 // Pad: finger segments shorter than this (px) are jitter and do not turn the bat.
 export const PAD_MIN_MOVE = 2;
+
+// Phone page.
+export const ROOM_PARAM = 'room'; // ?room=CODE in the join link
+export const WS_PATH = '/';
+export const INPUT_PER_S = 60; // most input messages a phone sends per second
+export const NET_EVENT = { OPEN: 'open', CLOSE: 'close' }; // socket events on() also reports
+export const PHONE_TEXT = {
+  JOIN: 'Join',
+  JOINING: 'Joining…',
+  TEAM: (label) => `${label} team`,
+  SCREEN_LEFT: 'The game screen closed',
+  DROPPED: 'Lost the connection to the game. Check that your phone is on the same Wi-Fi as the game.',
+  ERROR: {
+    [JOIN_ERROR.NO_ROOM]: 'No game uses that room code. Check the code on the game screen.',
+    [JOIN_ERROR.TEAM_FULL]: 'That team is full. Pick the other team.',
+    [JOIN_ERROR.BAD_NAME]: `Enter a name of 1 to ${NAME_MAX} characters.`,
+    [JOIN_ERROR.BAD_TEAM]: 'Pick Left or Right.',
+  },
+};

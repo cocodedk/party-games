@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Team Pong</title>
+  <!-- StyleX writes all rules to this file at build time (its fallback when no other CSS exists). -->
+  <link rel="stylesheet" href="/assets/stylex.css">
+</head>
+<body>
+  <form id="form" novalidate>
+    <h1 id="title">Team Pong</h1>
+    <label id="roomLabel">Room code <input id="room" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+    <label id="nameLabel">Your name <input id="name" autocomplete="nickname"></label>
+    <div id="teams">
+      <button type="button" data-team="left">Left</button>
+      <button type="button" data-team="right">Right</button>
+    </div>
+    <p id="error" role="alert"></p>
+    <button id="join" type="submit">Join</button>
+  </form>
+  <section id="lost" hidden>
+    <p id="lostText"></p>
+    <button id="again" type="button">Join again</button>
+  </section>
+  <section id="pad" hidden>
+    <p id="who"></p>
+    <p id="hint">Slide your finger to move your bat. Draw circles to turn it.</p>
+  </section>
+  <script type="module" src="./phone/main.js"></script>
+</body>
+</html>

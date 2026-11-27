@@ -4,11 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server/index.js",
-    "test": "node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-exclude='tests/**' --test-coverage-exclude='e2e/**' --test-coverage-exclude='web/*/main.js' --test-coverage-exclude='web/*/styles.js' --test-coverage-exclude='web/screen/lobby.js' --test-coverage-exclude='web/shared/net.js' --test-coverage-exclude='web/games/pong/render.js' --test-coverage-exclude='web/games/pong/sound.js' 'tests/**/*.test.js'"
+    "build": "vite build",
+    "start": "vite build && node server/index.js",
+    "test": "vite build && node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-exclude='tests/**' --test-coverage-exclude='e2e/**' --test-coverage-exclude='web/*/main.js' --test-coverage-exclude='web/*/styles.js' --test-coverage-exclude='web/screen/lobby.js' --test-coverage-exclude='web/shared/net.js' --test-coverage-exclude='web/games/pong/render.js' --test-coverage-exclude='web/games/pong/sound.js' 'tests/**/*.test.js'"
   },
   "dependencies": {
     "qrcode": "^1.5.4",
     "ws": "^8.23.0"
+  },
+  "devDependencies": {
+    "@stylexjs/stylex": "^0.19.2",
+    "@stylexjs/unplugin": "^0.19.2",
+    "vite": "^8.4.0"
   }
 }
