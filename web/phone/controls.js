@@ -25,8 +25,9 @@ function statusText({ phase, score }) {
   return PHONE_TEXT.SCORE(score[TEAM.LEFT], score[TEAM.RIGHT]);
 }
 
-/** Adds the phase line and controls to root; send(type, payload) sends a game-master command. */
-export function createControls(root, send) {
+/** Adds the phase line and controls to root; send(type, payload) sends a game-master command.
+ * padless (/host): a page that is not game master says it is waiting in every phase, not only in lobby and over. */
+export function createControls(root, send, padless = false) {
   let state = null; // the last state, or null before the first
   let master = false;
 
@@ -86,7 +87,7 @@ export function createControls(root, send) {
       lobby: master && phase === PHASE.LOBBY,
       match: master && ACTIVE.includes(phase),
       over: master && phase === PHASE.OVER,
-      wait: !master && (phase === PHASE.LOBBY || phase === PHASE.OVER),
+      wait: !master && !!state && (padless || phase === PHASE.LOBBY || phase === PHASE.OVER),
     };
     for (const key in boxes) boxes[key].style.display = shown[key] ? '' : 'none'; // a flex class would beat hidden
     if (!state) return;

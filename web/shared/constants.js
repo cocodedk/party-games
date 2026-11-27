@@ -116,6 +116,9 @@ export const PHONE_TEXT = {
   END: 'End game',
   AGAIN: 'Play again',
   LOBBY: 'Back to lobby',
+  CONNECT: 'Connect',
+  CONNECTING: 'Connecting…',
+  ROOM: (code) => `Room ${code} · Game master`,
   DROPPED: 'Lost the connection to the game. Check that your phone is on the same Wi-Fi as the game.',
   ERROR: {
     [JOIN_ERROR.NO_ROOM]: 'No game uses that room code. Check the code on the game screen.',

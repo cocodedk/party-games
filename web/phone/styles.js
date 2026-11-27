@@ -101,7 +101,7 @@ export const styles = stylex.create({
     fontWeight: 700,
     whiteSpace: 'nowrap',
     pointerEvents: 'auto',
-    border: `3px solid ${BLACK}`,
+    border: '3px solid currentColor', // white on the black /host page, black on a selected button
     borderRadius: RADIUS,
     backgroundColor: BLACK,
     color: WHITE,

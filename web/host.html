@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Pong · Game master</title>
+  <!-- StyleX writes all rules to this file at build time (its fallback when no other CSS exists). -->
+  <link rel="stylesheet" href="/assets/stylex.css">
+</head>
+<body>
+  <form id="form" novalidate>
+    <h1 id="title">Team Pong</h1>
+    <label id="roomLabel">Room code <input id="room" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+    <p id="error" role="alert"></p>
+    <button id="join" type="submit"></button>
+  </form>
+  <section id="lost" hidden>
+    <p id="lostText"></p>
+    <button id="again" type="button">Join again</button>
+  </section>
+  <section id="controls" hidden>
+    <p id="who"></p>
+  </section>
+  <script type="module" src="./host/main.js"></script>
+</body>
+</html>
