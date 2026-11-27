@@ -1,16 +1,9 @@
 // The lobby: QR code, room code, join URL and each team's player list.
-import * as stylex from '@stylexjs/stylex';
+import { apply } from '../shared/dom.js';
 import { styles } from './styles.js';
 import { TEAMS, TEAM, TEAM_NAME, QR_PATH, ROOM_PARAM, SCREEN_TEXT, HOST_PATH, RULES_TEXT } from '../shared/constants.js';
 
 const byId = (id) => document.getElementById(id);
-
-/** Sets the StyleX classes (and dynamic style variables) of a node. */
-export function apply(node, ...looks) {
-  const { className, style } = stylex.props(...looks);
-  node.className = className || '';
-  for (const key in style) node.style.setProperty(key, style[key]);
-}
 
 export function createLobby() {
   const root = byId('lobby');

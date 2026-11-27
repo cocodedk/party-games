@@ -42,3 +42,4 @@ The `/host` page (075); WebMCP tools (09); anything assigned to another spec in 
 - runner (2026-11-27): this spec's files include `web/phone/main.js`, `web/phone/styles.js`, `web/shared/net.js`, `web/index.html` and `package.json`.
 - runner (2026-11-27): to keep files under 200 lines the builder may add DOM-only glue files beside the listed ones (e.g. `web/phone/controls.js`) and add each to the coverage exclusions in `package.json` like the existing DOM files; game logic stays in tested modules.
 - runner (2026-11-27): new on-screen text goes through the customer-words pass before the PR.
+- runner (2026-11-27): `state` carries no countdown seconds, so during `countdown` the phone's status line says "Get ready" instead of a number (the TV shows the count, spec 08); no change to match.js, the screen or the relay.

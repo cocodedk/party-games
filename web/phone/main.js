@@ -1,5 +1,6 @@
-import * as stylex from '@stylexjs/stylex';
 import { createPad } from './pad.js';
+import { createControls } from './controls.js';
+import { apply } from '../shared/dom.js';
 import { connect } from '../shared/net.js';
 import { styles } from './styles.js';
 import {
@@ -14,13 +15,7 @@ const el = {
   pad: byId('pad'), who: byId('who'), hint: byId('hint'),
 };
 const teamButtons = Array.from(el.teams.querySelectorAll('button'));
-
-/** Sets the StyleX classes (and dynamic style variables) of a node. */
-function apply(node, ...looks) {
-  const { className, style } = stylex.props(...looks);
-  node.className = className || '';
-  for (const key in style) node.style.setProperty(key, style[key]);
-}
+const controls = createControls(el.pad, (type, payload) => net && net.send(type, payload));
 
 let team = null;
 let net = null; // the live connection, or null
@@ -109,7 +104,14 @@ function join(event) {
   const conn = connect(WS_PATH);
   net = conn;
   conn.on(NET_EVENT.OPEN, () => conn.send(MSG.JOIN, msg));
-  conn.on(MSG.JOINED, (m) => startPad(m.color));
+  conn.on(MSG.JOINED, (m) => {
+    startPad(m.color);
+    controls.update(null);
+    controls.role(m.isMaster);
+  });
+  conn.on(MSG.ROLE, (m) => controls.role(m.isMaster));
+  conn.on(MSG.STATE, (m) => controls.update(m));
+  conn.on(MSG.BUZZ, (m) => navigator.vibrate && navigator.vibrate(m.ms)); // absent on some browsers: no buzz
   conn.on(MSG.ERROR, (m) => fail(PHONE_TEXT.ERROR[m.reason]));
   conn.on(MSG.CLOSED, () => lost(PHONE_TEXT.SCREEN_LEFT));
   conn.on(NET_EVENT.CLOSE, () => lost(PHONE_TEXT.DROPPED));

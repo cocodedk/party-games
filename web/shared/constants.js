@@ -105,6 +105,17 @@ export const PHONE_TEXT = {
   JOINING: 'Joining…',
   TEAM: (label) => `${label} team`,
   SCREEN_LEFT: 'The game screen closed',
+  GET_READY: 'Get ready',
+  SCORE: (left, right) => `${left} – ${right}`,
+  WAITING: 'Waiting for the game master',
+  LESS: '−',
+  MORE: '+',
+  START: 'Start',
+  PAUSE: 'Pause',
+  RESUME: 'Resume',
+  END: 'End game',
+  AGAIN: 'Play again',
+  LOBBY: 'Back to lobby',
   DROPPED: 'Lost the connection to the game. Check that your phone is on the same Wi-Fi as the game.',
   ERROR: {
     [JOIN_ERROR.NO_ROOM]: 'No game uses that room code. Check the code on the game screen.',
@@ -150,6 +161,7 @@ export const S_PER_MIN = 60;
 export const CHANGE = { PHASE: 'phase', SERVE: 'serve' }; // step() changes: {type: PHASE, phase} / {type: SERVE, toward: team}
 export const FIRST_SERVE_LEFT_BELOW = 0.5; // rng() below this serves first toward the left team
 export const DRAW = 'draw'; // view().winner when a match ends level
+export const MODE_TEXT = { [MATCH_MODE.TIME]: 'Time', [MATCH_MODE.SCORE]: 'Goals' }; // the phone's mode toggle
 export const RULES_TEXT = { // the lobby's line for the chosen settings
   [MATCH_MODE.TIME]: (value) => `Play for ${value} ${value === 1 ? 'minute' : 'minutes'}`,
   [MATCH_MODE.SCORE]: (value) => `First to ${value} ${value === 1 ? 'goal' : 'goals'} wins`,

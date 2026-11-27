@@ -1,5 +1,6 @@
 import { connect } from '../shared/net.js';
-import { createLobby, apply } from './lobby.js';
+import { createLobby } from './lobby.js';
+import { apply } from '../shared/dom.js';
 import { styles } from './styles.js';
 import { createBat, setTarget } from '../games/pong/bat.js';
 import { createBall, stepWorld } from '../games/pong/physics.js';
