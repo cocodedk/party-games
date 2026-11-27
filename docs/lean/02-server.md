@@ -25,3 +25,5 @@ Anything assigned to another spec in the plan.
 
 ## Decisions
 
+- runner (2026-11-27): this spec adds `MSG` (the message types it routes) and the 1 KB message-size limit to `web/shared/constants.js`, which is part of its files.
+

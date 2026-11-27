@@ -20,3 +20,37 @@ export const JOIN_ERROR = {
   BAD_NAME: 'bad-name',
   BAD_TEAM: 'bad-team',
 };
+
+// WebSocket messages the server routes: { type, ...payload }.
+export const MSG = {
+  CREATE: 'create',
+  CREATED: 'created',
+  JOIN: 'join',
+  JOINED: 'joined',
+  ERROR: 'error',
+  PLAYER: 'player',
+  LEFT: 'left',
+  INPUT: 'input',
+  BUZZ: 'buzz',
+  CLOSED: 'closed',
+};
+
+export const MESSAGE_MAX_BYTES = 1024;
+
+export const DEFAULT_PORT = 8080;
+export const LOCALHOST = 'localhost';
+export const QR_PATH = '/qr.svg';
+export const SITE_ROOT = 'dist';
+export const PAGES = { '/': 'index.html', '/screen': 'screen.html', '/host': 'host.html' };
+export const CONTENT_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.txt': 'text/plain; charset=utf-8',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+};
+export const CONTENT_TYPE_BINARY = 'application/octet-stream';
+export const HTTP_STATUS = { OK: 200, NOT_FOUND: 404 };
