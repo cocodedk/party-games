@@ -1,16 +1,21 @@
-// WebAudio bleeps and fanfares, made with oscillators. Silent until unlock() runs inside a user gesture.
+// WebAudio bleeps and fanfares, made with oscillators. The context is made at load, so sound is on from
+// the start where the browser allows it without a gesture (a TV, a trusted site, an autoplay flag);
+// elsewhere it stays silent until unlock() runs inside a user gesture.
 import { SOUND, SOUND_WAVE, SOUND_GAIN, SOUND_SILENT } from '../../shared/constants.js';
 
-export function createSound() {
-  let audio = null;
+const RUNNING = 'running';
+
+/** onStart(): called when sound starts playing, with or without a gesture. */
+export function createSound(onStart) {
+  const audio = new AudioContext();
+  audio.onstatechange = () => audio.state === RUNNING && onStart();
   return {
     unlock() {
-      if (!audio) audio = new AudioContext();
       audio.resume();
     },
-    /** name: a key of SOUND. */
+    /** name: a key of SOUND. Skipped while silent, so blocked sounds never pile up for later. */
     play(name) {
-      if (!audio) return;
+      if (audio.state !== RUNNING) return;
       const t0 = audio.currentTime;
       for (const [freq, start, length] of SOUND[name]) {
         const osc = audio.createOscillator();

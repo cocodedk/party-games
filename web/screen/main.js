@@ -6,6 +6,7 @@ import { createBat, setTarget } from '../games/pong/bat.js';
 import { createBall, stepWorld } from '../games/pong/physics.js';
 import { frozen } from '../games/pong/bumps.js';
 import { createMatch } from '../games/pong/match.js';
+import { createScorers } from '../games/pong/scorers.js';
 import { fit, draw } from '../games/pong/render.js';
 import { createSound } from '../games/pong/sound.js';
 import { registerScreenTools } from './tools.js';
@@ -21,9 +22,11 @@ const prompt = document.getElementById('sound');
 const ctx = canvas.getContext('2d');
 const lobby = createLobby();
 const match = createMatch({ rng: Math.random });
-const sound = createSound();
+const scorers = createScorers();
+const sound = createSound(() => unlock()); // sound on by itself: drop the prompt as a click would
 const popAt = { [TEAM.LEFT]: -Infinity, [TEAM.RIGHT]: -Infinity }; // performance.now() of each team's last goal
 let seen = match.view(); // the view sync last saw, for the fanfares and score pop
+let endLines = null; // the scorer lines, taken once when the match ends
 const world = { ball: null, bats: new Map(), now: 0 }; // bats: player id → bat
 let ball = null; // the ball in play; world.ball holds it only while playing
 let view = null;
@@ -47,7 +50,11 @@ function serve(toward) {
 /** Lays the page out for the phase and sends the phones the state when it changed. */
 function sync() {
   const { phase, score, timeLeft, settings, canStart } = match.view();
-  if (phase !== seen.phase && phase === PHASE.OVER) sound.play(SOUND_NAME.WIN);
+  if (phase !== seen.phase && phase === PHASE.OVER) {
+    sound.play(SOUND_NAME.WIN);
+    endLines = scorers.lines();
+  }
+  if (phase === PHASE.COUNTDOWN && (seen.phase === PHASE.LOBBY || seen.phase === PHASE.OVER)) scorers.reset(); // a match begins
   for (const team of TEAMS) {
     if (score[team] <= seen.score[team]) continue;
     popAt[team] = performance.now();
@@ -72,12 +79,16 @@ function hud() {
   if (phase === PHASE.LOBBY) return null;
   let label = null;
   if (phase === PHASE.COUNTDOWN) label = { text: String(countdown), size: HUD.COUNTDOWN_SIZE, color: LINE_COLOR };
+  if (phase === PHASE.GOAL) {
+    const { team, name, own } = scorers.goal();
+    label = { text: SCREEN_TEXT.GOAL(name, own), size: HUD.GOAL_SIZE, color: TEAM_COLOR[team] };
+  }
   if (phase === PHASE.PAUSED) label = { text: SCREEN_TEXT.PAUSED, size: HUD.LABEL_SIZE, color: LINE_COLOR };
   if (phase === PHASE.OVER && winner === DRAW) label = { text: SCREEN_TEXT.DRAW, size: HUD.WINNER_SIZE, color: LINE_COLOR };
   else if (phase === PHASE.OVER) label = { text: SCREEN_TEXT.WINS(winner), size: HUD.WINNER_SIZE, color: TEAM_COLOR[winner] };
   const grow = {}; // each team's score pop, shrinking from SCORE_POP.GROW to 0
   for (const team of TEAMS) grow[team] = Math.max(0, 1 - (performance.now() - popAt[team]) / SCORE_POP.MS) * SCORE_POP.GROW;
-  return { score, timeLeft, label, grow };
+  return { score, timeLeft, label, grow, scorers: phase === PHASE.OVER ? endLines : null };
 }
 
 function tick(now) {
@@ -87,6 +98,7 @@ function tick(now) {
     world.ball = match.view().phase === PHASE.PLAYING ? ball : null;
     const free = [...world.bats.keys()].filter((id) => !frozen(world.bats.get(id), world.now)); // already frozen: no new buzz
     const events = stepWorld(world, dt);
+    scorers.step(events, world.bats);
     for (const e of events) {
       if (EVENT_SOUND[e.type]) sound.play(EVENT_SOUND[e.type]);
       if (e.type === EVENT.BUMP) for (const id of e.ids) if (free.includes(id)) net.send(MSG.BUZZ, { id, ms: BUMP_BUZZ_MS });
