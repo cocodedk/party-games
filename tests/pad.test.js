@@ -83,3 +83,12 @@ test('two taps too far apart are two upright taps', () => {
   pad.down(10, 10, W, H, 20 + TAP.DOUBLE_MS);
   assert.equal(pad.up(30 + TAP.DOUBLE_MS), TAP.UPRIGHT);
 });
+
+test('a relaxed double tap counts: the second tap begins within DOUBLE_MS of the first one ending', () => {
+  const pad = createPad();
+  const hold = TAP.MS - 50; // a deliberate, not hurried, tap
+  pad.down(10, 10, W, H, 0);
+  assert.equal(pad.up(hold), TAP.UPRIGHT);
+  pad.down(10, 10, W, H, hold + TAP.DOUBLE_MS);
+  assert.equal(pad.up(2 * hold + TAP.DOUBLE_MS), TAP.FLAT);
+});

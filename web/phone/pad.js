@@ -40,13 +40,14 @@ export function createPad() {
     up(now, cancelled = false) {
       anchor = null;
       dir = null;
-      const tap = !cancelled && press !== null && !press.moved && now - press.now <= TAP.MS;
+      const began = press && press.now;
+      const tap = !cancelled && press !== null && !press.moved && now - began <= TAP.MS;
       press = null;
       if (!tap) {
         tapAt = -Infinity;
         return null;
       }
-      const double = now - tapAt <= TAP.DOUBLE_MS;
+      const double = began - tapAt <= TAP.DOUBLE_MS; // this tap began soon after the last one ended
       a = nearest(a, double ? TAP.FLAT : TAP.UPRIGHT);
       tapAt = double ? -Infinity : now;
       return a;

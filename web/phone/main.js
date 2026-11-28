@@ -1,4 +1,5 @@
 import { createPad } from './pad.js';
+import { createRejoin } from './rejoin.js';
 import { createControls } from './controls.js';
 import { apply } from '../shared/dom.js';
 import { connect } from '../shared/net.js';
@@ -117,7 +118,11 @@ function join(event) {
   conn.on(MSG.BUZZ, (m) => navigator.vibrate && navigator.vibrate(m.ms)); // absent on some browsers: no buzz
   conn.on(MSG.ERROR, (m) => fail(PHONE_TEXT.ERROR[m.reason]));
   conn.on(MSG.CLOSED, () => lost(PHONE_TEXT.SCREEN_LEFT));
-  conn.on(NET_EVENT.CLOSE, () => lost(PHONE_TEXT.DROPPED));
+  conn.on(NET_EVENT.CLOSE, () => {
+    const wasIn = pad !== null; // in the game, not still joining
+    lost(PHONE_TEXT.DROPPED);
+    if (wasIn) rejoin.dropped();
+  });
 }
 
 function at(event) {
@@ -151,6 +156,7 @@ el.pad.addEventListener('pointerup', lift(false));
 el.pad.addEventListener('pointercancel', lift(true));
 
 el.form.addEventListener('submit', join);
+const rejoin = createRejoin(() => join(new Event('submit')));
 registerPhoneTools({
   masterTools: controls.tools,
   join(msg) { // fills the form as a person would, then submits it

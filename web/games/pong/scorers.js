@@ -5,9 +5,11 @@ import { TEAMS, EVENT, SCREEN_TEXT } from '../../shared/constants.js';
 export function createScorers() {
   let last = null; // the bat that last hit the ball in play
   let tally = null; // per team: own and name → { name, own, goals }, in first-scored order
+  let latest = null; // the last goal: { team it counts for, name (null: nobody touched it), own }
 
   function reset() {
     last = null;
+    latest = null;
     tally = {};
     for (const team of TEAMS) tally[team] = new Map();
   }
@@ -18,10 +20,11 @@ export function createScorers() {
     for (const e of events) {
       if (e.type === EVENT.HIT) last = bats.get(e.id);
       if (e.type !== EVENT.GOAL) continue;
+      latest = { team: e.side, name: last ? last.name : null, own: Boolean(last) && last.team !== e.side };
       if (last) {
-        const own = last.team !== e.side;
-        const key = `${own}:${last.name}`;
-        const seen = tally[e.side].get(key) ?? { name: last.name, own, goals: 0 };
+        const { name, own } = latest;
+        const key = `${own}:${name}`;
+        const seen = tally[e.side].get(key) ?? { name, own, goals: 0 };
         seen.goals += 1;
         tally[e.side].set(key, seen);
       }
@@ -38,5 +41,8 @@ export function createScorers() {
     return out;
   }
 
-  return { reset, step, lines };
+  /** The last goal, for the fanfare's line; null before the first. */
+  const goal = () => latest;
+
+  return { reset, step, lines, goal };
 }

@@ -97,7 +97,7 @@ export const EVENT = { WALL: 'wall', HIT: 'hit', GOAL: 'goal', BUMP: 'bump' };
 
 // Pad: finger segments shorter than this (px) are jitter and do not turn the bat.
 export const PAD_MIN_MOVE = 2;
-export const TAP = { MS: 250, MOVE_PX: 12, DOUBLE_MS: 350, UPRIGHT: 0, FLAT: Math.PI / 2 }; // a touch this short and still is a tap; DOUBLE_MS between two taps' ends
+export const TAP = { MS: 400, MOVE_PX: 12, DOUBLE_MS: 300, UPRIGHT: 0, FLAT: Math.PI / 2 }; // a touch this short and still is a tap; one starting DOUBLE_MS after a tap ends doubles it (Android's timings)
 
 // Phone page.
 export const ROOM_PARAM = 'room'; // ?room=CODE in the join link
@@ -149,6 +149,7 @@ export const SCREEN_TEXT = {
   DRAW: 'Draw',
   SOUND: 'Click or press OK for sound',
   SCORER: (name, goals, own) => `${name} ${goals}${own ? ' (own goal)' : ''}`,
+  GOAL: (name, own) => (name ? `${own ? 'Own goal' : 'Goal'}! ${name}` : 'Goal!'), // with the goal fanfare; no name: nobody touched it
 };
 export const TEAM_COLOR = { [TEAM.LEFT]: '#4fc3f7', [TEAM.RIGHT]: '#ffb74d' }; // the winner line
 export const BAT_NAME = { COLOR: '#000', SIZE: 0.7, FILL: 0.9 }; // the player's name on the bat: SIZE of its thickness, at most FILL of its length
@@ -173,7 +174,7 @@ export const BUMP_BUZZ_MS = 150; // phone vibration when its bat bumps a teammat
 export const HUD = { // field units; LABEL_OUTLINE: per font size
   SCORE_Y: 0.9, SCORE_SIZE: 1.1, SCORE_GAP: 0.9, CLOCK_Y: 1.8, CLOCK_SIZE: 0.6,
   LABEL_SIZE: 1.3, COUNTDOWN_SIZE: 3, WINNER_SIZE: 1.5, LABEL_OUTLINE: 0.2,
-  SCORERS_Y: 5.7, SCORERS_SIZE: 0.4, SCORERS_GAP: 0.45, // the end screen's scorer lines, under each team's half
+  SCORERS_Y: 5.7, SCORERS_SIZE: 0.4, SCORERS_GAP: 0.45, GOAL_SIZE: 1, // the end screen's scorer lines; the goal's scorer
 };
 export const CLOCK_SECONDS_DIGITS = 2; // the clock shows m:ss
 

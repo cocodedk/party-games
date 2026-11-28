@@ -23,7 +23,7 @@ const ctx = canvas.getContext('2d');
 const lobby = createLobby();
 const match = createMatch({ rng: Math.random });
 const scorers = createScorers();
-const sound = createSound();
+const sound = createSound(() => unlock()); // sound on by itself: drop the prompt as a click would
 const popAt = { [TEAM.LEFT]: -Infinity, [TEAM.RIGHT]: -Infinity }; // performance.now() of each team's last goal
 let seen = match.view(); // the view sync last saw, for the fanfares and score pop
 let endLines = null; // the scorer lines, taken once when the match ends
@@ -79,6 +79,10 @@ function hud() {
   if (phase === PHASE.LOBBY) return null;
   let label = null;
   if (phase === PHASE.COUNTDOWN) label = { text: String(countdown), size: HUD.COUNTDOWN_SIZE, color: LINE_COLOR };
+  if (phase === PHASE.GOAL) {
+    const { team, name, own } = scorers.goal();
+    label = { text: SCREEN_TEXT.GOAL(name, own), size: HUD.GOAL_SIZE, color: TEAM_COLOR[team] };
+  }
   if (phase === PHASE.PAUSED) label = { text: SCREEN_TEXT.PAUSED, size: HUD.LABEL_SIZE, color: LINE_COLOR };
   if (phase === PHASE.OVER && winner === DRAW) label = { text: SCREEN_TEXT.DRAW, size: HUD.WINNER_SIZE, color: LINE_COLOR };
   else if (phase === PHASE.OVER) label = { text: SCREEN_TEXT.WINS(winner), size: HUD.WINNER_SIZE, color: TEAM_COLOR[winner] };
