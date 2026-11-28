@@ -130,7 +130,7 @@ el.pad.addEventListener('pointerdown', (event) => {
   pointer = event.pointerId;
   el.pad.setPointerCapture(pointer);
   apply(el.hint, styles.hint, styles.hintGone);
-  pose = pad.down(...at(event));
+  pose = pad.down(...at(event), event.timeStamp);
   sendPose();
 });
 el.pad.addEventListener('pointermove', (event) => {
@@ -138,13 +138,17 @@ el.pad.addEventListener('pointermove', (event) => {
   pose = pad.move(...at(event));
   sendPose();
 });
-const lift = (event) => {
+// A tap stands the bat upright and a double tap lays it flat; a cancelled touch is never a tap.
+const lift = (cancelled) => (event) => {
   if (event.pointerId !== pointer) return;
   pointer = null;
-  pad.up();
+  const a = pad.up(event.timeStamp, cancelled);
+  if (a === null) return;
+  pose = { ...pose, a };
+  sendPose();
 };
-el.pad.addEventListener('pointerup', lift);
-el.pad.addEventListener('pointercancel', lift);
+el.pad.addEventListener('pointerup', lift(false));
+el.pad.addEventListener('pointercancel', lift(true));
 
 el.form.addEventListener('submit', join);
 registerPhoneTools({

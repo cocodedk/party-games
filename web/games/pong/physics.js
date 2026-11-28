@@ -1,9 +1,10 @@
 // Ball step with wall, goal and bat collisions; teammate bumps live in bumps.js.
+// The end walls bounce the ball except across their centred goal mouth.
 // world = { ball (null: bats only, no goal), bats (array or Map), now (ms) }; stepWorld advances now by dt.
 // Bats and ball move together in substeps, each moving at most half a bat thickness.
 import {
   TEAM, FIELD_W, FIELD_H, BAT_LENGTH, BAT_THICKNESS, MS_PER_S, BALL_RADIUS, BALL_MAX,
-  BALL_HIT_SPEEDUP, BAT_SWING_SHARE, WALL_FREE_STEPS, EVENT,
+  BALL_HIT_SPEEDUP, BAT_SWING_SHARE, WALL_FREE_STEPS, EVENT, GOAL_TOP, GOAL_BOTTOM,
 } from '../../shared/constants.js';
 import { stepBat, batEnds, clamp } from './bat.js';
 import { sub, dot, len, unit, closest } from './geom.js';
@@ -12,7 +13,10 @@ import { bump, frozen } from './bumps.js';
 const MAX_SUBSTEP = BAT_THICKNESS / 2;
 const REACH = BALL_RADIUS + BAT_THICKNESS / 2; // ball centre to bat centre line at contact
 
-const inField = (y) => Math.min(FIELD_H - BALL_RADIUS, Math.max(BALL_RADIUS, y));
+const inside = (v, size) => Math.min(size - BALL_RADIUS, Math.max(BALL_RADIUS, v)); // the ball centre a radius in from both edges
+const inField = (y) => inside(y, FIELD_H);
+const inMouth = (y) => y >= GOAL_TOP && y <= GOAL_BOTTOM;
+const away = (v, up) => (up ? Math.abs(v) : -Math.abs(v)); // a speed sent the way a wall pushed
 const gapAt = (p, ends) => len(sub(p, closest(p, ends)));
 
 export function createBall() {
@@ -71,18 +75,23 @@ function collideBat(ball, bat, hit, events) {
   ball.vx = out.x;
   ball.vy = out.y;
   hit.add(bat);
-  events.push({ type: EVENT.HIT });
+  events.push({ type: EVENT.HIT, id: bat.id });
 }
 
+// Outside the goal mouth the end walls push the ball back in, even one a bat squeezed past the line.
 function collideWalls(ball, events) {
   const y = inField(ball.y);
-  if (y === ball.y) return;
-  ball.vy = y > ball.y ? Math.abs(ball.vy) : -Math.abs(ball.vy);
+  const x = inMouth(ball.y) ? ball.x : inside(ball.x, FIELD_W);
+  if (y === ball.y && x === ball.x) return;
+  if (y !== ball.y) ball.vy = away(ball.vy, y > ball.y);
+  if (x !== ball.x) ball.vx = away(ball.vx, x > ball.x);
+  ball.x = x;
   ball.y = y;
   events.push({ type: EVENT.WALL });
 }
 
 function goalSide(ball) {
+  if (!inMouth(ball.y)) return null;
   if (ball.x + BALL_RADIUS < 0) return TEAM.RIGHT;
   if (ball.x - BALL_RADIUS > FIELD_W) return TEAM.LEFT;
   return null;

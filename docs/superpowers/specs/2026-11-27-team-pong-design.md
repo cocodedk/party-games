@@ -88,7 +88,8 @@ changes.
 
 - 16:9 field in logical units, drawn to one canvas, scaled to the window, device-pixel ratio capped
   at 1–1.5 for cheap rendering. Fixed physics step (60 Hz), draw on requestAnimationFrame.
-- Top and bottom edges bounce the ball; the ball leaving the left or right edge is a goal for the
+- Top and bottom edges bounce the ball; the left and right edges bounce it too, except across a goal
+  mouth one third of the field's height, centred; the ball leaving through a goal mouth is a goal for the
   other team.
 - A bat is a line segment with thickness, centre (x, y) and angle. Its target pose comes from the
   phone; the bat eases toward it (fast enough to feel direct, smooth over network jitter). Its
@@ -105,6 +106,8 @@ changes.
   (pad left = field left, pad top = field top).
 - Rotation: the bat's angle changes by the signed turning of the finger's movement direction, so a
   straight drag moves without rotating and a circle spins the bat the same way round.
+- A quick tap (short, without dragging) also stands the bat upright; a second tap right after lays it
+  flat. Each snaps by the smaller turn.
 - Lifting the finger leaves the bat where it is.
 - Each player gets a colour shown on their phone and on their bat.
 

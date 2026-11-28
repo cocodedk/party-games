@@ -74,9 +74,12 @@ export const HTTP_STATUS = { OK: 200, NOT_FOUND: 404 };
 // Field in logical units (16:9); each team owns half of it.
 export const FIELD_W = 16;
 export const FIELD_H = 9;
+export const GOAL_SHARE = 1 / 3; // the goal mouth's share of each end wall, centred; the rest of the wall bounces the ball
+export const GOAL_TOP = FIELD_H * (1 - GOAL_SHARE) / 2;
+export const GOAL_BOTTOM = FIELD_H - GOAL_TOP;
 
 // Bat: a thick segment; angle 0 is vertical, positive turns clockwise on screen.
-export const BAT_LENGTH = 1.8;
+export const BAT_LENGTH = 1.4;
 export const BAT_THICKNESS = 0.25;
 export const BAT_EASE_MS = 80; // time to cover BAT_EASE_REACHED of the way to the target
 export const BAT_EASE_REACHED = 0.95;
@@ -94,6 +97,7 @@ export const EVENT = { WALL: 'wall', HIT: 'hit', GOAL: 'goal', BUMP: 'bump' };
 
 // Pad: finger segments shorter than this (px) are jitter and do not turn the bat.
 export const PAD_MIN_MOVE = 2;
+export const TAP = { MS: 250, MOVE_PX: 12, DOUBLE_MS: 350, UPRIGHT: 0, FLAT: Math.PI / 2 }; // a touch this short and still is a tap; DOUBLE_MS between two taps' ends
 
 // Phone page.
 export const ROOM_PARAM = 'room'; // ?room=CODE in the join link
@@ -144,8 +148,10 @@ export const SCREEN_TEXT = {
   WINS: (team) => `${TEAM_NAME[team]} wins`,
   DRAW: 'Draw',
   SOUND: 'Click or press OK for sound',
+  SCORER: (name, goals, own) => `${name} ${goals}${own ? ' (own goal)' : ''}`,
 };
 export const TEAM_COLOR = { [TEAM.LEFT]: '#4fc3f7', [TEAM.RIGHT]: '#ffb74d' }; // the winner line
+export const BAT_NAME = { COLOR: '#000', SIZE: 0.7, FILL: 0.9 }; // the player's name on the bat: SIZE of its thickness, at most FILL of its length
 export const BUMP_BLINK_MS = 100; // a frozen bat swaps to LINE_COLOR and back at this period
 export const SCORE_POP = { MS: 600, GROW: 0.4 }; // a team's score grows by GROW of its size after a goal, shrinking back over MS
 // WebAudio bleeps: per sound, notes of [frequency Hz, start s, length s].
@@ -167,6 +173,7 @@ export const BUMP_BUZZ_MS = 150; // phone vibration when its bat bumps a teammat
 export const HUD = { // field units; LABEL_OUTLINE: per font size
   SCORE_Y: 0.9, SCORE_SIZE: 1.1, SCORE_GAP: 0.9, CLOCK_Y: 1.8, CLOCK_SIZE: 0.6,
   LABEL_SIZE: 1.3, COUNTDOWN_SIZE: 3, WINNER_SIZE: 1.5, LABEL_OUTLINE: 0.2,
+  SCORERS_Y: 5.7, SCORERS_SIZE: 0.4, SCORERS_GAP: 0.45, // the end screen's scorer lines, under each team's half
 };
 export const CLOCK_SECONDS_DIGITS = 2; // the clock shows m:ss
 

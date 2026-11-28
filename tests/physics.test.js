@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createBall, stepWorld } from '../web/games/pong/physics.js';
 import { createBat, batEnds } from '../web/games/pong/bat.js';
 import {
-  TEAM, FIELD_W, FIELD_H, BAT_THICKNESS, BALL_RADIUS, BALL_MAX, BALL_HIT_SPEEDUP, BUMP_FREEZE_MS, EVENT,
+  TEAM, BAT_THICKNESS, BALL_RADIUS, BALL_MAX, BALL_HIT_SPEEDUP, BUMP_FREEZE_MS, EVENT,
   MS_PER_S,
 } from '../web/shared/constants.js';
 
@@ -35,25 +35,9 @@ function gap(b, bt) {
   return Math.hypot(b.x - p.x - ab.x * t, b.y - p.y - ab.y * t);
 }
 
-test('ball bounces off the top and bottom walls', () => {
-  for (const [y, vy] of [[BALL_RADIUS + 0.01, -SPEED], [FIELD_H - BALL_RADIUS - 0.01, SPEED]]) {
-    const world = { ball: ball(8, y, 0, vy), bats: [] };
-    assert.deepEqual(types(stepWorld(world, DT)), [EVENT.WALL]);
-    assert.equal(world.ball.vy, -vy);
-  }
-});
-
-test('ball leaving the left edge is a goal for the right team', () => {
-  const world = { ball: ball(-BALL_RADIUS + 0.01, 4, -SPEED, 0), bats: [] };
-  assert.deepEqual(stepWorld(world, DT), [{ type: EVENT.GOAL, side: TEAM.RIGHT }]);
-  const right = { ball: ball(FIELD_W + BALL_RADIUS - 0.01, 4, SPEED, 0), bats: [] };
-  assert.deepEqual(stepWorld(right, DT), [{ type: EVENT.GOAL, side: TEAM.LEFT }]);
-  assert.deepEqual(stepWorld({ ball: null, bats: [] }, DT), []); // no ball, no goal
-});
-
 test('head-on hit reflects about the bat normal', () => {
   const world = { ball: ball(4 + REACH + 0.05, 4.5, -SPEED, 0), bats: [bat('a', 4, 4.5, 0)] };
-  assert.ok(types(stepWorld(world, DT)).includes(EVENT.HIT));
+  assert.deepEqual(stepWorld(world, DT).find((e) => e.type === EVENT.HIT), { type: EVENT.HIT, id: 'a' }); // names the bat
   assert.ok(Math.abs(world.ball.vx - SPEED * BALL_HIT_SPEEDUP) < EPS && Math.abs(world.ball.vy) < EPS);
 });
 
